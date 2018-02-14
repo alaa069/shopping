@@ -1,0 +1,51 @@
+{
+    "User": [
+        {
+            "username": "alaa",
+            "password": "alaa",
+            "role":"alaa"
+        },
+        {
+            "username": "admin",
+            "password": "admin",
+            "role":"admin"
+        },
+        {
+            "username": "user",
+            "password": "user",
+            "role":"user"
+        }
+    ],
+    "Stock": [
+        {
+            "Produit": "aaaa",
+            "QT" : 20,
+            "Prix": 10
+        },
+        {
+            "Produit": "bbbb",
+            "QT" : 20,
+            "Prix": 10
+        },
+        {
+            "Produit": "cccc",
+            "QT" : 20,
+            "Prix": 10
+        },
+        {
+            "Produit": "dddd",
+            "QT" : 20,
+            "Prix": 10
+        },
+        {
+            "Produit": "eeee",
+            "QT" : 20,
+            "Prix": 10
+        },
+        {
+            "Produit": "ffff",
+            "QT" : 20,
+            "Prix": 10
+        }
+    ]
+}

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <link rel="stylesheet" href="../css/bootstrap.min.css">
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+
+<body>
+    <div class="container">
+        <form class="login-form">
+            <div class="form-group">
+                <input type="text" class="form-control" id="username" placeholder="Entrer votre login" required>
+            </div>
+            <div class="form-group">
+                <input type="password" class="form-control" id="password" placeholder="Entrer votre mot de passe" required>
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-success btn-lg btn-block" id="signInBtn">Connecter</button>
+                <button type="reset" class="btn btn-danger btn-lg btn-block" id="signInBtn">Reset</button>
+            </div>
+            
+        </form>
+    </div>
+    <script>
+        // you can also require other files to run this process
+        require('../js/renderer.js')
+    </script>
+</body>
+
+</html>

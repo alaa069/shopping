@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>ShoppingList</title>
+    <!-- Compiled and minified CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css">
+</head>
+
+<body>
+    <nav class="light-blue lighten-1" role="navigation">
+        <div class="nav-wrapper container">
+            <a id="logo-container" href="#" class="brand-logo">Logo</a>
+        </div>
+    </nav>
+
+    <ul class="collection">
+
+    </ul>
+
+    <footer class="page-footer light-blue lighten-1">
+        <div class="footer-copyright light-blue lighten-1">
+            <div class="container">
+                © <script>document.write(new Date().getFullYear())</script> Copyright Text
+                <a class="grey-text text-lighten-4 right" href="#!">More Links</a>
+            </div>
+        </div>
+    </footer>
+
+
+    <script>
+        const electron = require("electron");
+        const { ipcRenderer } = electron;
+        const ul = document.querySelector("ul");
+
+        // Add item
+        ipcRenderer.on('item:add', function (e, item) {
+            const li = document.createElement('li');
+            li.className = "collection-item";
+            const itemText = document.createTextNode(item);
+            li.appendChild(itemText);
+            ul.appendChild(li)
+        });
+
+        // Clear items
+        ipcRenderer.on('item:clear', function (e, item) {
+            ul.innerHTML = '';
+        });
+
+        // Remove item
+        ul.addEventListener('dblclick', removeItem);
+
+        function removeItem(e) {
+            e.target.remove()
+        }
+
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,110 @@
+const electron = require("electron");
+const url = require("url");
+const path = require("path");
+
+const {app, BrowserWindow, Menu, ipcMain} = electron;
+
+let mainWindow;
+let addItem;
+
+// Listen for app to be ready
+
+app.on('ready', function(){
+    // Create new window
+    mainWindow = new BrowserWindow({})
+    // Load HTML file into window
+    mainWindow.loadURL(url.format({
+        pathname:  path.join(__dirname, 'mainWindow.html'),
+        protocol: 'file:',
+        slashes: true
+    }));
+
+    // Quit app when closed
+    mainWindow.on('closed', function(){
+        app.quit();
+    });
+
+    // Build Menu from template
+    const mainMenu = Menu.buildFromTemplate(mainMenuTemplate);
+    // Insert Menu
+    Menu.setApplicationMenu(mainMenu);
+})
+
+// Handle create add window
+
+function createAddItem(){
+    // Create new window
+    addItem = new BrowserWindow({
+        width: 300,
+        height: 200,
+        title: 'Add Shopping List Item'
+    })
+    // Load HTML file into window
+    addItem.loadURL(url.format({
+        pathname:  path.join(__dirname, 'addItem.html'),
+        protocol: 'file:',
+        slashes: true
+    }));
+    // Garbage collection handle
+    addItem.on('close', function(){
+        addItem = null
+    })
+}
+
+// Catch item:add
+ipcMain.on('item:add', function(e, item){
+    mainWindow.webContents.send('item:add', item);
+    addItem.close();
+})
+
+// create Menu template
+const mainMenuTemplate = [
+    {
+        label: 'File',
+        submenu: [
+            {
+                label : 'Add Item',
+                click(){
+                    createAddItem();
+                }
+            },
+            {
+                label: 'Clear Items',
+                click(){
+                    mainWindow.webContents.send('item:clear');
+                }
+            },
+            {
+                label: 'Quit',
+                accelerator : process.platform == 'darwin' ? 'Command+Q' : 'Ctrl+Q',
+                click(){
+                    app.quit();
+                }
+            }
+        ]
+    }
+]
+
+// If MAC, add empty object to Menu
+if(process.platform == 'darwin'){
+    mainMenuTemplate.unshift({});
+}
+
+// add developer tools item if not in prod
+if(process.env.NODE_ENC !== 'production'){
+    mainMenuTemplate.push({
+        label: 'Developer Tools',
+        submenu:[
+            {
+                label: 'Toggle DevTools',
+                accelerator : process.platform == 'darwin' ? 'Command+I' : 'Ctrl+I',
+                click(item, focusedWindow){
+                    focusedWindow.toggleDevTools();
+                }
+            },
+            {
+                role: 'reload'
+            }
+        ]
+    })
+}
