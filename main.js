@@ -22,6 +22,10 @@ app.on('ready', function () {
         protocol: 'file:',
         slashes: true
     }));
+    // Build Menu from template
+    const mainMenu = Menu.buildFromTemplate(mainMenuTemplate);
+    // Insert Menu
+    Menu.setApplicationMenu(mainMenu);
 })
 
 ipcMain.on('login', function (e, username, password) {
@@ -43,6 +47,12 @@ ipcMain.on('login', function (e, username, password) {
             slashes: true
         }));
         mainWindow.close();
+        // Add new Menu
+        mainMenuTemplate[1] = { label: 'Dashboard', submenu: [{ label: 'Facture' },{label : 'Stock'}] };
+        // Build new Menu from template
+        const mainMenu = Menu.buildFromTemplate(mainMenuTemplate);
+        // Insert new Menu
+        Menu.setApplicationMenu(mainMenu);
     }
 })
 
@@ -52,8 +62,8 @@ const mainMenuTemplate = [
         submenu: [
             {
                 label: 'Quit',
-                accelerator : process.platform == 'darwin' ? 'Command+Q' : 'Ctrl+Q',
-                click(){
+                accelerator: process.platform == 'darwin' ? 'Command+Q' : 'Ctrl+Q',
+                click() {
                     app.quit();
                 }
             }
@@ -62,19 +72,19 @@ const mainMenuTemplate = [
 ]
 
 // If MAC, add empty object to Menu
-if(process.platform == 'darwin'){
+if (process.platform == 'darwin') {
     mainMenuTemplate.unshift({});
 }
 
 // add developer tools item if not in prod
-if(process.env.NODE_ENC !== 'production'){
+if (process.env.NODE_ENC !== 'production') {
     mainMenuTemplate.push({
         label: 'Developer Tools',
-        submenu:[
+        submenu: [
             {
                 label: 'Toggle DevTools',
-                accelerator : process.platform == 'darwin' ? 'Command+I' : 'Ctrl+I',
-                click(item, focusedWindow){
+                accelerator: process.platform == 'darwin' ? 'Command+I' : 'Ctrl+I',
+                click(item, focusedWindow) {
                     focusedWindow.toggleDevTools();
                 }
             },
