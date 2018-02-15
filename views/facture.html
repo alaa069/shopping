@@ -1,12 +1,197 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Facture</title>
-    <link rel="stylesheet" href="../css/bootstrap.min.css">
-    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/bootstrap3.min.css">
+
+    <link rel="stylesheet" type="text/css" href="../css/style.css">
 </head>
-<body>
-    <h1>Facture</h1>
+
+<body ng-app="invoicing" ng-controller="InvoiceCtrl">
+    <!--<nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container">
+            <a class="navbar-brand" href="#">Facture</a>
+            <div class="collapse navbar-collapse" id="navbarTogglerDemo02">
+                <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="myDashboardOpen();">Tableau de bord</a>
+                    </li>
+                    <li class="nav-item active">
+                        <a class="nav-link" href="#">Facture
+                            <span class="sr-only">(current)</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="myStockOpen();">Stock</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>-->
+
+    <nav class="navbar navbar-default">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1"
+                    aria-expanded="false">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#">Facture</a>
+            </div>
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                    <li>
+                        <a href="#" onclick="myDashboardOpen();">Tableau de bord</a>
+                    </li>
+                    <li class="active">
+                        <a href="#">Facture
+                            <span class="sr-only">(current)</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" onclick="myStockOpen();">Stock</a>
+                    </li>
+            </div>
+    </nav>
+
+    <!--<div class="container">
+        <h1>My facture</h1>
+        <input type="text" id="searchItem" oninput="searchStock()">
+        <p id="demo"></p>
+    </div>-->
+
+    <div class="container" width="800px" id="invoice">
+        <div class="row">
+            <div class="col-xs-12 heading">
+                Facture
+            </div>
+        </div>
+        <div class="row branding">
+            <div class="col-xs-6">
+                <div class="invoice-number-container">
+                    <label for="invoice-number">Facture Ref#</label>
+                    <input type="text" id="invoice-number" ng-model="invoice.invoice_number" />
+                </div>
+            </div>
+            <div class="col-xs-6 logo-container">
+                <input type="file" id="imgInp" />
+                <img ng-hide="logoRemoved" id="company_logo" ng-src="{{ logo }}" alt="your image" width="300" />
+                <div>
+                    <div class="noPrint" ng-hide="printMode">
+                        <a ng-click="editLogo()" href>Modifié Logo</a>
+                        <a ng-click="toggleLogo()" id="remove_logo" href>{{ logoRemoved ? 'Affiché' : 'Caché' }} logo</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row infos">
+            <div class="col-xs-6">
+                <div class="input-container">
+                    <input type="text" ng-model="invoice.customer_info.name" />
+                </div>
+                <div class="input-container">
+                    <input type="text" ng-model="invoice.customer_info.web_link" />
+                </div>
+                <div class="input-container">
+                    <input type="text" ng-model="invoice.customer_info.address1" />
+                </div>
+                <div class="input-container">
+                    <input type="text" ng-model="invoice.customer_info.address2" />
+                </div>
+                <div class="input-container">
+                    <input type="text" ng-model="invoice.customer_info.postal" />
+                </div>
+                <div class="input-container" data-ng-hide='printMode'>
+                    <select ng-model='currencySymbol' ng-options='currency.symbol as currency.name for currency in availableCurrencies'></select>
+                </div>
+            </div>
+            <div class="col-xs-6 right">
+                <div class="input-container">
+                    <input type="text" ng-model="invoice.company_info.name" />
+                </div>
+                <div class="input-container">
+                    <input type="text" ng-model="invoice.company_info.web_link" />
+                </div>
+                <div class="input-container">
+                    <input type="text" ng-model="invoice.company_info.address1" />
+                </div>
+                <div class="input-container">
+                    <input type="text" ng-model="invoice.company_info.address2" />
+                </div>
+                <div class="input-container">
+                    <input type="text" ng-model="invoice.company_info.postal" />
+                </div>
+            </div>
+        </div>
+        <div class="items-table">
+            <div class="row header">
+                <div class="col-xs-1">&nbsp;</div>
+                <div class="col-xs-5">Description</div>
+                <div class="col-xs-2">Quantité</div>
+                <div class="col-xs-2">Prix.unit {{currencySymbol}}</div>
+                <div class="col-xs-2 text-right">Total</div>
+            </div>
+            <div class="row invoice-item" ng-repeat="item in invoice.items" ng-animate="'slide-down'">
+                <div class="col-xs-1 remove-item-container">
+                    <a href ng-hide="printMode" ng-click="removeItem(item)" class="btn btn-danger">[X]</a>
+                </div>
+                <div class="col-xs-5 input-container">
+                    <input ng-model="item.description" placeholder="Description" />
+                </div>
+                <div class="col-xs-2 input-container">
+                    <input ng-model="item.qty" value="1" size="4" ng-required ng-validate="integer" placeholder="Quantity" />
+                </div>
+                <div class="col-xs-2 input-container">
+                    <input ng-model="item.cost" value="0.00" ng-required ng-validate="number" size="6" placeholder="Cost" />
+                </div>
+                <div class="col-xs-2 text-right input-container">
+                    {{item.cost * item.qty | currency: currencySymbol}}
+                </div>
+            </div>
+            <div class="row invoice-item">
+                <div class="col-xs-12 add-item-container" ng-hide="printMode">
+                    <a class="btn btn-primary" href ng-click="addItem()">[+]</a>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-10 text-right">Total HT</div>
+                <div class="col-xs-2 text-right">{{invoiceSubTotal() | currency: currencySymbol}}</div>
+            </div>
+            <div class="row">
+                <div class="col-xs-10 text-right">Tax(%):
+                    <input ng-model="invoice.tax" ng-validate="number" style="width:43px">
+                </div>
+                <div class="col-xs-2 text-right">{{calculateTax() | currency: currencySymbol}}</div>
+            </div>
+            <div class="row">
+                <div class="col-xs-10 text-right">Total:</div>
+                <div class="col-xs-2 text-right">{{calculateGrandTotal() | currency: currencySymbol}}</div>
+            </div>
+        </div>
+        <div class="row noPrint actions">
+            <a href="#" class="btn btn-success" ng-show="printMode" ng-click="printInfo()">Imprimé</a>
+            <a href="#" class="btn btn-danger" ng-click="clearLocalStorage()">Annuler</a>
+            <a href="#" class="btn btn-primary" ng-hide="printMode" ng-click="printMode = true;">Activé Mode Imprmante</a>
+            <a href="#" class="btn btn-primary" ng-show="printMode" ng-click="printMode = false;">Désactivé Mode Imprmante</a>
+        </div>
+    </div>
+
+    <div ng-hide="printMode" class="copy noPrint">
+        Made with
+        <span class="love">&#9829;</span> in Hammam Lif by
+        <a href="http://linkedin.col/">Alaa BEN JABALLAH.</a>
+    </div>
+
+    <script src="../js/index.js"></script>
+    <script type="text/javascript" src="../js/angular.min.js"></script>
+    <script type="text/javascript" src="../js/moment.min.js"></script>
+    <script type="text/javascript" src="../js/main.js"></script>
 </body>
+
 </html>

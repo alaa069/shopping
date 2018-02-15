@@ -39,7 +39,11 @@ ipcMain.on('login', function (e, username, password) {
     }
     if (userExist) {
         // Create new window
-        dashWindow = new BrowserWindow({})
+        dashWindow = new BrowserWindow({
+            width: 992,
+            height: 700,
+            title: 'Tableau de bord'
+        })
         // Load HTML file into window
         dashWindow.loadURL(url.format({
             pathname: path.join(__dirname, 'views/dashboard.html'),
@@ -48,13 +52,52 @@ ipcMain.on('login', function (e, username, password) {
         }));
         mainWindow.close();
         // Add new Menu
-        mainMenuTemplate[1] = { label: 'Dashboard', submenu: [{ label: 'Facture' },{label : 'Stock'}] };
+        mainMenuTemplate.push({ label: 'Dashboard', submenu: [{ label: 'Facture',click(){ goToFacture(); } },{label : 'Stock',click(){ goToStock(); }}] });
         // Build new Menu from template
         const mainMenu = Menu.buildFromTemplate(mainMenuTemplate);
         // Insert new Menu
         Menu.setApplicationMenu(mainMenu);
     }
 })
+
+function goToFacture(){
+    dashWindow.loadURL(url.format({
+        pathname: path.join(__dirname, 'views/facture.html'),
+        protocol: 'file:',
+        slashes: true
+    }));
+}
+
+function goToStock(){
+    dashWindow.loadURL(url.format({
+        pathname: path.join(__dirname, 'views/stock.html'),
+        protocol: 'file:',
+        slashes: true
+    }));
+}
+
+function goToDashboard(){
+    dashWindow.loadURL(url.format({
+        pathname: path.join(__dirname, 'views/dashboard.html'),
+        protocol: 'file:',
+        slashes: true
+    }));
+}
+
+ipcMain.on('factureOpenEvent', function(e, item){
+    goToFacture()
+})
+
+ipcMain.on('stockOpenEvent', function(e, item){
+    goToStock()
+})
+
+ipcMain.on('dashboardOpenEvent', function(e, item){
+    goToDashboard()
+})
+
+
+//mainWindow.webContents.send('item:add', item);
 
 const mainMenuTemplate = [
     {
