@@ -69,7 +69,8 @@
     <div class="container" width="800px" id="invoice">
         <div class="row">
             <div class="col-xs-12 heading">
-                Facture
+                Facture 
+                We are using Node.js <script>document.write(JSON.stringify(process.versions))</script>.
             </div>
         </div>
         <div class="row branding">
@@ -142,7 +143,10 @@
                     <a href ng-hide="printMode" ng-click="removeItem(item)" class="btn btn-danger">[X]</a>
                 </div>
                 <div class="col-xs-5 input-container">
-                    <input ng-model="item.description" placeholder="Description" />
+                    <input data-ng-model="item.description" ng-blur="searchStock(item)" placeholder="Description" list="browsersList" />
+                    <datalist id="browsersList">
+                        <option ng-repeat="stock in Stock" value="{{stock.Produit}}" />
+                    </datalist>
                 </div>
                 <div class="col-xs-2 input-container">
                     <input ng-model="item.qty" value="1" size="4" ng-required ng-validate="integer" placeholder="Quantity" />
@@ -183,9 +187,9 @@
     </div>
 
     <div ng-hide="printMode" class="copy noPrint">
-        Made with
-        <span class="love">&#9829;</span> in Hammam Lif by
-        <a href="http://linkedin.col/">Alaa BEN JABALLAH.</a>
+        Fait par 
+        <span class="love">&#9829;</span> à Hammam Lif par
+        <a href="https://www.facebook.com/alaa069">Alaa BEN JABALLAH</a> et <a href="https://www.facebook.com/ridha.noomane">Ridha NOOMANE</a>
     </div>
 
     <script src="../js/index.js"></script>

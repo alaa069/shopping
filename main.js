@@ -38,6 +38,7 @@ ipcMain.on('login', function (e, username, password) {
         }
     }
     if (userExist) {
+        const injectCode = fs.readFileSync("./js/inputlistpopup.js", "utf8");
         // Create new window
         dashWindow = new BrowserWindow({
             width: 992,
@@ -50,6 +51,9 @@ ipcMain.on('login', function (e, username, password) {
             protocol: 'file:',
             slashes: true
         }));
+        dashWindow.webContents.on("did-finish-load", () => {
+            dashWindow.webContents.executeJavaScript(injectCode);
+        });
         mainWindow.close();
         // Add new Menu
         mainMenuTemplate.push({ label: 'Dashboard', submenu: [{ label: 'Facture',click(){ goToFacture(); } },{label : 'Stock',click(){ goToStock(); }}] });

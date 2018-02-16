@@ -21,7 +21,7 @@ function myDashboardOpen() {
     ipcRenderer.send('dashboardOpenEvent');
 }
 
-function searchStock() {
+/*function searchStock() {
     const searchItem = document.querySelector('#searchItem').value;
     var searchExist = false;
     var searchIndex = [];
@@ -42,4 +42,5 @@ function searchStock() {
             }
         }
     }
-}
+}*/
+
