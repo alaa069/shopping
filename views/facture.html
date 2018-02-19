@@ -69,8 +69,7 @@
     <div class="container" width="800px" id="invoice">
         <div class="row">
             <div class="col-xs-12 heading">
-                Facture 
-                We are using Node.js <script>document.write(JSON.stringify(process.versions))</script>.
+                <h1>Facture</h1>
             </div>
         </div>
         <div class="row branding">
@@ -143,13 +142,13 @@
                     <a href ng-hide="printMode" ng-click="removeItem(item)" class="btn btn-danger">[X]</a>
                 </div>
                 <div class="col-xs-5 input-container">
-                    <input data-ng-model="item.description" ng-blur="searchStock(item)" placeholder="Description" list="browsersList" />
+                    <input data-ng-model="item.description" ng-change="searchStock(item)" placeholder="Description" list="browsersList" />
                     <datalist id="browsersList">
-                        <option ng-repeat="stock in Stock" value="{{stock.Produit}}" />
+                        <option ng-repeat="stock in Stock" value="{{stock.NomProduit}}" />
                     </datalist>
                 </div>
                 <div class="col-xs-2 input-container">
-                    <input ng-model="item.qty" value="1" size="4" ng-required ng-validate="integer" placeholder="Quantity" />
+                    <input ng-model="item.qty" value="1" size="4" ng-change="stockManager(item)" ng-required ng-validate="integer" placeholder="Quantity" />
                 </div>
                 <div class="col-xs-2 input-container">
                     <input ng-model="item.cost" value="0.00" ng-required ng-validate="number" size="6" placeholder="Cost" />

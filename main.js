@@ -10,7 +10,8 @@ let dashWindow;
 const dataBase = fs.readFileSync('./db.json');
 const dataBaseParse = JSON.parse(dataBase);
 const User = dataBaseParse.User;
-const Stock = dataBaseParse.Stock;
+const StockDB = fs.readFileSync('./StockDB.json');
+const Stock = JSON.parse(StockDB);
 
 // Listen for app to be ready
 app.on('ready', function () {
@@ -62,6 +63,10 @@ ipcMain.on('login', function (e, username, password) {
         // Insert new Menu
         Menu.setApplicationMenu(mainMenu);
     }
+})
+
+ipcMain.on('my-Stock', function (e, data) {
+    console.log(data)
 })
 
 function goToFacture(){

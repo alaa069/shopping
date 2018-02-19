@@ -5,7 +5,8 @@ const fs = require("fs");
 const dataBase = fs.readFileSync('./db.json');
 const dataBaseParse = JSON.parse(dataBase);
 const User = dataBaseParse.User;
-const Stock = dataBaseParse.Stock;
+const StockDB = fs.readFileSync('./StockDB.json');
+const Stock = JSON.parse(StockDB);
 
 function myFactureOpen() {
     ipcRenderer.send('factureOpenEvent');

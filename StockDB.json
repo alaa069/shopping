@@ -1,0 +1,32 @@
+[
+    {
+        "Reference": "Ref11",
+        "NomProduit": "Sablito",
+        "PrixAchat": 8,
+        "NbrStock": 30,
+        "PrixCatA": 10,
+        "PrixCatB": 9.5,
+        "PrixCatC": 9,
+        "PrixCatD": 8.5
+    },
+    {
+        "Reference": "Ref22",
+        "NomProduit": "Pate",
+        "PrixAchat": 15,
+        "NbrStock": 30,
+        "PrixCatA": 20,
+        "PrixCatB": 19,
+        "PrixCatC": 18,
+        "PrixCatD": 17
+    },
+    {
+        "Reference": "Ref33",
+        "NomProduit": "Chocolat",
+        "PrixAchat": 24,
+        "NbrStock": 30,
+        "PrixCatA": 30,
+        "PrixCatB": 29,
+        "PrixCatC": 28,
+        "PrixCatD": 27
+    }
+]

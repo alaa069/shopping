@@ -120,170 +120,164 @@ angular.module('invoicing', [])
       $scope.currencySymbol = 'DT ';
       $scope.logoRemoved = false;
       $scope.printMode = false;
-      $scope.Stock = [
-        {
-            "Produit": "aaaa",
-            "QT" : 20,
-            "Prix": 10
-        },
-        {
-            "Produit": "aabb",
-            "QT" : 50,
-            "Prix": 30
-        },
-        {
-            "Produit": "bbbb",
-            "QT" : 200,
-            "Prix": 100
-        },
-        {
-            "Produit": "cccc",
-            "QT" : 20,
-            "Prix": 10
-        },
-        {
-            "Produit": "dddd",
-            "QT" : 20,
-            "Prix": 10
-        },
-        {
-            "Produit": "eeee",
-            "QT" : 20,
-            "Prix": 10
-        },
-        {
-            "Produit": "ffff",
-            "QT" : 20,
-            "Prix": 10
+      //$scope.Stock = [];
+      $scope.StockTemp = [];
+
+      (function init() {
+
+        !function () {
+          $http.get('../StockDB.json').success(function (data) {
+            $scope.Stock = data;
+          });
+        }()
+        // Attempt to load invoice from local storage
+        !function () {
+          var invoice = LocalStorage.getInvoice();
+          $scope.invoice = invoice ? invoice : DEFAULT_INVOICE;
+        }();
+
+        // Set logo to the one from local storage or use default
+        !function () {
+          var logo = LocalStorage.getLogo();
+          $scope.logo = logo ? logo : DEFAULT_LOGO;
+        }();
+
+        $scope.availableCurrencies = Currency.all();
+
+      })()
+      // Adds an item to the invoice's items
+      $scope.addItem = function () {
+        $scope.invoice.items.push({ qty: 0, cost: 0, description: "" });
+      }
+
+      // Toggle's the logo
+      $scope.toggleLogo = function (element) {
+        $scope.logoRemoved = !$scope.logoRemoved;
+        LocalStorage.clearLogo();
+      };
+
+      // Triggers the logo chooser click event
+      $scope.editLogo = function () {
+        // angular.element('#imgInp').trigger('click');
+        document.getElementById('imgInp').click();
+      };
+
+      $scope.printInfo = function () {
+        console.log('printInfo')
+        var ipcRenderer = require("electron").ipcRenderer;
+        ipcRenderer.send('my-Stock', $scope.StockTemp);
+        window.print();
+      };
+
+      // Remotes an item from the invoice
+      $scope.removeItem = function (item) {
+        $scope.invoice.items.splice($scope.invoice.items.indexOf(item), 1);
+      };
+
+      // Search stock
+      $scope.searchStock = function (item) {
+        //console.log(JSON.stringify($scope.Stock))
+        //$scope.invoice.items.push({ qty: 0, cost: 0, description: "" });
+        //$scope.invoice.items[$scope.invoice.items.indexOf(item)].cost = $scope.Stock[$scope.Stock.indexOf(item.description)].Prix;
+        //$scope.Stock = []
+        angular.forEach($scope.Stock, function (stock, key) {
+          if (stock.NomProduit == item.description) {
+            $scope.invoice.items[$scope.invoice.items.indexOf(item)].cost = stock.PrixCatA
+            $scope.invoice.items[$scope.invoice.items.indexOf(item)].qty = stock.NbrStock
+          }
+        });
+      };
+
+      $scope.stockManager = function (item) {
+        if ($scope.StockTemp.length == 0) {
+          angular.forEach($scope.Stock, function (stock, key) {
+            if (stock.NomProduit == item.description) {
+              stock.NbrStockRemove = parseInt(item.qty);
+              $scope.StockTemp.push(stock);
+            }
+          });
+        } else {
+          var stockExistTemp = false;
+          angular.forEach($scope.StockTemp, function (stock, key) {
+            if (stock.NomProduit == item.description) {
+              stock.NbrStockRemove = parseInt(item.qty);
+              $scope.StockTemp[key] = stock;
+              stockExistTemp = true;
+            }
+            if ((key == $scope.StockTemp.length - 1) && (stockExistTemp == false)) {
+              angular.forEach($scope.Stock, function (stock, key) {
+                if (stock.NomProduit == item.description) {
+                  stock.NbrStockRemove = parseInt(item.qty);
+                  $scope.StockTemp.push(stock);
+                }
+              });
+            }
+          });
         }
-    ];
-
-(function init() {
-
-  /*!function () {
-    $http.get('../db.json').success(function (data) {
-      $scope.Stock = data.Stock;
-    });
-  }()*/
-  // Attempt to load invoice from local storage
-  !function () {
-    var invoice = LocalStorage.getInvoice();
-    $scope.invoice = invoice ? invoice : DEFAULT_INVOICE;
-  }();
-
-  // Set logo to the one from local storage or use default
-  !function () {
-    var logo = LocalStorage.getLogo();
-    $scope.logo = logo ? logo : DEFAULT_LOGO;
-  }();
-
-  $scope.availableCurrencies = Currency.all();
-
-})()
-// Adds an item to the invoice's items
-$scope.addItem = function () {
-  console.log("aa")
-  $scope.invoice.items.push({ qty: 0, cost: 0, description: "" });
-}
-
-// Toggle's the logo
-$scope.toggleLogo = function (element) {
-  $scope.logoRemoved = !$scope.logoRemoved;
-  LocalStorage.clearLogo();
-};
-
-// Triggers the logo chooser click event
-$scope.editLogo = function () {
-  // angular.element('#imgInp').trigger('click');
-  document.getElementById('imgInp').click();
-};
-
-$scope.printInfo = function () {
-  window.print();
-};
-
-// Remotes an item from the invoice
-$scope.removeItem = function (item) {
-  $scope.invoice.items.splice($scope.invoice.items.indexOf(item), 1);
-};
-
-// Search stock
-$scope.searchStock = function (item) {
-  //console.log(JSON.stringify($scope.Stock))
-  //$scope.invoice.items.push({ qty: 0, cost: 0, description: "" });
-  //$scope.invoice.items[$scope.invoice.items.indexOf(item)].cost = $scope.Stock[$scope.Stock.indexOf(item.description)].Prix;
-  console.log(item)
-  //$scope.Stock = []
-  angular.forEach($scope.Stock, function (stock, key) {
-    if(stock.Produit == item.description){
-      $scope.invoice.items[$scope.invoice.items.indexOf(item)].cost = stock.Prix
-      $scope.invoice.items[$scope.invoice.items.indexOf(item)].qty = stock.QT
-    }
-  });
-};
+      }
 
 
-// Calculates the sub total of the invoice
-$scope.invoiceSubTotal = function () {
-  var total = 0.00;
-  angular.forEach($scope.invoice.items, function (item, key) {
-    total += (item.qty * item.cost);
-  });
-  return total;
-};
+      // Calculates the sub total of the invoice
+      $scope.invoiceSubTotal = function () {
+        var total = 0.00;
+        angular.forEach($scope.invoice.items, function (item, key) {
+          total += (item.qty * item.cost);
+        });
+        return total;
+      };
 
-// Calculates the tax of the invoice
-$scope.calculateTax = function () {
-  return (($scope.invoice.tax * $scope.invoiceSubTotal()) / 100);
-};
+      // Calculates the tax of the invoice
+      $scope.calculateTax = function () {
+        return (($scope.invoice.tax * $scope.invoiceSubTotal()) / 100);
+      };
 
-// Calculates the grand total of the invoice
-$scope.calculateGrandTotal = function () {
-  saveInvoice();
-  return $scope.calculateTax() + $scope.invoiceSubTotal();
-};
+      // Calculates the grand total of the invoice
+      $scope.calculateGrandTotal = function () {
+        saveInvoice();
+        return $scope.calculateTax() + $scope.invoiceSubTotal();
+      };
 
-// Clears the local storage
-$scope.clearLocalStorage = function () {
-  var confirmClear = confirm('Are you sure you would like to clear the invoice?');
-  if (confirmClear) {
-    LocalStorage.clear();
-    setInvoice(DEFAULT_INVOICE);
-  }
-};
+      // Clears the local storage
+      $scope.clearLocalStorage = function () {
+        var confirmClear = confirm('Are you sure you would like to clear the invoice?');
+        if (confirmClear) {
+          LocalStorage.clear();
+          setInvoice(DEFAULT_INVOICE);
+        }
+      };
 
-// Sets the current invoice to the given one
-var setInvoice = function (invoice) {
-  $scope.invoice = invoice;
-  saveInvoice();
-};
+      // Sets the current invoice to the given one
+      var setInvoice = function (invoice) {
+        $scope.invoice = invoice;
+        saveInvoice();
+      };
 
-// Reads a url
-var readUrl = function (input) {
-  if (input.files && input.files[0]) {
-    var reader = new FileReader();
-    reader.onload = function (e) {
-      document.getElementById('company_logo').setAttribute('src', e.target.result);
-      LocalStorage.setLogo(e.target.result);
-    }
-    reader.readAsDataURL(input.files[0]);
-  }
-};
+      // Reads a url
+      var readUrl = function (input) {
+        if (input.files && input.files[0]) {
+          var reader = new FileReader();
+          reader.onload = function (e) {
+            document.getElementById('company_logo').setAttribute('src', e.target.result);
+            LocalStorage.setLogo(e.target.result);
+          }
+          reader.readAsDataURL(input.files[0]);
+        }
+      };
 
-// Saves the invoice in local storage
-var saveInvoice = function () {
-  LocalStorage.setInvoice($scope.invoice);
-};
+      // Saves the invoice in local storage
+      var saveInvoice = function () {
+        LocalStorage.setInvoice($scope.invoice);
+      };
 
-// Runs on document.ready
-angular.element(document).ready(function () {
-  // Set focus
-  document.getElementById('invoice-number').focus();
+      // Runs on document.ready
+      angular.element(document).ready(function () {
+        // Set focus
+        document.getElementById('invoice-number').focus();
 
-  // Changes the logo whenever the input changes
-  document.getElementById('imgInp').onchange = function () {
-    readUrl(this);
-  };
-});
+        // Changes the logo whenever the input changes
+        document.getElementById('imgInp').onchange = function () {
+          readUrl(this);
+        };
+      });
 
     }])
