@@ -7,6 +7,7 @@ const dataBaseParse = JSON.parse(dataBase);
 const User = dataBaseParse.User;
 const StockDB = fs.readFileSync('./StockDB.json');
 const Stock = JSON.parse(StockDB);
+const factureHistoryList = JSON.parse(fs.readFileSync('./FactureHistoryDB.json'));
 
 function myFactureOpen() {
     ipcRenderer.send('factureOpenEvent');
@@ -22,26 +23,30 @@ function myDashboardOpen() {
     ipcRenderer.send('dashboardOpenEvent');
 }
 
-/*function searchStock() {
-    const searchItem = document.querySelector('#searchItem').value;
-    var searchExist = false;
-    var searchIndex = [];
-    if(searchItem=='') document.getElementById("demo").innerHTML = '';
-    else
-    for (var i = 0; i < Stock.length; i++) {
-        if (Stock[i].Produit.includes(searchItem)) {
-            var searchExist = true;
-            searchIndex.push(Stock[i])
-        }
-        if (i == Stock.length -1) {
-            if(searchExist){
-                document.getElementById("demo").innerHTML = JSON.stringify(searchIndex);
-                searchIndex = [];
-                searchExist = false;
-            } else {
-                document.getElementById("demo").innerHTML = '';
-            }
-        }
-    }
-}*/
+function myListClientOpen() {
+    ipcRenderer.send('listclientOpenEvent');
+}
 
+function myBonDeLivraisonOpen() {
+    ipcRenderer.send('bondelivraisonOpenEvent');
+}
+
+function myFactureHistoryOpen() {
+    ipcRenderer.send('facturehistoryOpenEvent');
+}
+
+var myFactureList = document.getElementById("myFactureList").getElementsByTagName("tbody")[0];
+
+for (var i = 0; i < factureHistoryList.length; i ++){
+    var rowList = myFactureList.insertRow(myFactureList.rows.length);
+
+    var cell1 = rowList.insertCell(0);
+    var cell2 = rowList.insertCell(1);
+
+    cell1.innerHTML = factureHistoryList[i].invoice_number;
+    cell2.innerHTML = factureHistoryList[i].customer_info.codeClient;
+
+    rowList.onclick= function(){
+        ipcRenderer.send('factureOpenEventListItem', this.rowIndex - 1);
+    };
+}

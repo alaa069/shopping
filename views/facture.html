@@ -32,7 +32,7 @@
     </nav>-->
 
     <nav class="navbar navbar-default">
-        <div class="container">
+        <div class="container-fluid">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1"
                     aria-expanded="false">
@@ -57,6 +57,16 @@
                     <li>
                         <a href="#" onclick="myStockOpen();">Stock</a>
                     </li>
+                    <li>
+                        <a href="#" onclick="myListClientOpen();">List Client</a>
+                    </li>
+                    <li>
+                        <a href="#" onclick="myBonDeLivraisonOpen();">Bon de livraison</a>
+                    </li>
+                    <li>
+                        <a href="#" onclick="myFactureHistoryOpen();">Facture History</a>
+                    </li>
+                </ul>
             </div>
     </nav>
 
@@ -93,19 +103,19 @@
         <div class="row infos">
             <div class="col-xs-6">
                 <div class="input-container">
-                    <input type="text" ng-model="invoice.customer_info.name" />
+                    <input type="text" ng-model="invoice.company_info.codeClient" />
                 </div>
                 <div class="input-container">
-                    <input type="text" ng-model="invoice.customer_info.web_link" />
+                    <input type="text" ng-model="invoice.company_info.nomClient" />
                 </div>
                 <div class="input-container">
-                    <input type="text" ng-model="invoice.customer_info.address1" />
+                    <input type="text" ng-model="invoice.company_info.Adresse" />
                 </div>
                 <div class="input-container">
-                    <input type="text" ng-model="invoice.customer_info.address2" />
+                    <input type="text" ng-model="invoice.company_info.codePostal" />
                 </div>
                 <div class="input-container">
-                    <input type="text" ng-model="invoice.customer_info.postal" />
+                    <input type="text" ng-model="invoice.company_info.webSite" />
                 </div>
                 <div class="input-container" data-ng-hide='printMode'>
                     <select ng-model='currencySymbol' ng-options='currency.symbol as currency.name for currency in availableCurrencies'></select>
@@ -113,19 +123,23 @@
             </div>
             <div class="col-xs-6 right">
                 <div class="input-container">
-                    <input type="text" ng-model="invoice.company_info.name" />
+                    <input type="text" ng-model="invoice.customer_info.codeClient" list="clientList" ng-change="getClientInfo(invoice.customer_info.codeClient)"
+                    />
+                    <datalist id="clientList">
+                        <option ng-repeat="client in ClientList" value="{{client.codeClient}}" />
+                    </datalist>
                 </div>
                 <div class="input-container">
-                    <input type="text" ng-model="invoice.company_info.web_link" />
+                    <input type="text" ng-model="invoice.customer_info.nomClient" />
                 </div>
                 <div class="input-container">
-                    <input type="text" ng-model="invoice.company_info.address1" />
+                    <input type="text" ng-model="invoice.customer_info.Adresse" />
                 </div>
                 <div class="input-container">
-                    <input type="text" ng-model="invoice.company_info.address2" />
+                    <input type="text" ng-model="invoice.customer_info.codePostal" />
                 </div>
                 <div class="input-container">
-                    <input type="text" ng-model="invoice.company_info.postal" />
+                    <input type="text" ng-model="invoice.customer_info.webSite" />
                 </div>
             </div>
         </div>
@@ -148,7 +162,8 @@
                     </datalist>
                 </div>
                 <div class="col-xs-2 input-container">
-                    <input ng-model="item.qty" value="1" size="4" ng-change="stockManager(item)" ng-required ng-validate="integer" placeholder="Quantity" />
+                    <input ng-model="item.qty" value="1" size="4" ng-change="stockManager(item)" ng-required ng-validate="integer" placeholder="Quantity"
+                    />
                 </div>
                 <div class="col-xs-2 input-container">
                     <input ng-model="item.cost" value="0.00" ng-required ng-validate="number" size="6" placeholder="Cost" />
@@ -162,7 +177,7 @@
                     <a class="btn btn-primary" href ng-click="addItem()">[+]</a>
                 </div>
             </div>
-            <div class="row">
+            <!--<div class="row">
                 <div class="col-xs-10 text-right">Total HT</div>
                 <div class="col-xs-2 text-right">{{invoiceSubTotal() | currency: currencySymbol}}</div>
             </div>
@@ -171,8 +186,8 @@
                     <input ng-model="invoice.tax" ng-validate="number" style="width:43px">
                 </div>
                 <div class="col-xs-2 text-right">{{calculateTax() | currency: currencySymbol}}</div>
-            </div>
-            <div class="row">
+            </div>-->
+            <div class="row header">
                 <div class="col-xs-10 text-right">Total:</div>
                 <div class="col-xs-2 text-right">{{calculateGrandTotal() | currency: currencySymbol}}</div>
             </div>
@@ -186,9 +201,10 @@
     </div>
 
     <div ng-hide="printMode" class="copy noPrint">
-        Fait par 
+        Fait par
         <span class="love">&#9829;</span> à Hammam Lif par
-        <a href="https://www.facebook.com/alaa069">Alaa BEN JABALLAH</a> et <a href="https://www.facebook.com/ridha.noomane">Ridha NOOMANE</a>
+        <a href="https://www.facebook.com/alaa069">Alaa BEN JABALLAH</a> et
+        <a href="https://www.facebook.com/ridha.noomane">Ridha NOOMANE</a>
     </div>
 
     <script src="../js/index.js"></script>

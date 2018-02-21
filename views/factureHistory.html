@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Facture</title>
+    <link rel="stylesheet" href="../css/bootstrap3.min.css">
+
+    <link rel="stylesheet" type="text/css" href="../css/style.css">
+</head>
+
+<body>
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1"
+                    aria-expanded="false">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#">Facture History</a>
+            </div>
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                    <li>
+                        <a href="#" onclick="myDashboardOpen();">Tableau de bord</a>
+                    </li>
+                    <li>
+                        <a href="#" onclick="myFactureOpen();">Facture</a>
+                    </li>
+                    <li>
+                        <a href="#" onclick="myStockOpen();">Stock</a>
+                    </li>
+                    <li>
+                        <a href="#" onclick="myListClientOpen();">List Client</a>
+                    </li>
+                    <li>
+                        <a href="#" onclick="myBonDeLivraisonOpen();">Bon de livraison</a>
+                    </li>
+                    <li class="active">
+                        <a href="#">Facture History
+                            <span class="sr-only">(current)</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+    </nav>
+
+    <div class="container">
+        <h2>List des Clients</h2>
+        <table class="table table-striped" id="myFactureList">
+            <thead>
+                <tr>
+                    <th>Facture Ref#</th>
+                    <th>Code Client</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="copy noPrint">
+        Fait par
+        <span class="love">&#9829;</span> à Hammam Lif par
+        <a href="https://www.facebook.com/alaa069">Alaa BEN JABALLAH</a> et
+        <a href="https://www.facebook.com/ridha.noomane">Ridha NOOMANE</a>
+    </div>
+
+    <script src="../js/index.js"></script>
+</body>
+
+</html>

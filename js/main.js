@@ -5,21 +5,21 @@ angular.module('invoicing', [])
 
   // The invoice displayed when the user first uses the app
   .constant('DEFAULT_INVOICE', {
-    tax: 13.00,
+    //tax: 13.00,
     invoice_number: moment().format('YYYYMMDDHHmmss'),
     customer_info: {
-      name: 'Mr. John Doe',
-      web_link: 'John Doe Designs Inc.',
-      address1: '1 Infinite Loop',
-      address2: 'Cupertino, California, US',
-      postal: '90210'
+      codeClient: 'client00',
+      nomClient: 'Mr. John Doe',
+      webSite: 'www.metawarelabs.com',
+      Adresse: '1 Infinite Loop',
+      codePostal: '90210'
     },
     company_info: {
-      name: 'Metaware Labs',
-      web_link: 'www.metawarelabs.com',
-      address1: '123 Yonge Street',
-      address2: 'Toronto, ON, Canada',
-      postal: 'M5S 1B6'
+      codeClient: 'Fornisseur1234',
+      nomClient: 'Ayman Inc',
+      webSite: 'www.metawarelabs.com',
+      Adresse: 'Hay Mohamed Ali, Hammam Lif',
+      codePostal: '2050'
     },
     items: [
       //{ qty: 10, description: 'Gadget', cost: 9.95 }
@@ -122,6 +122,7 @@ angular.module('invoicing', [])
       $scope.printMode = false;
       //$scope.Stock = [];
       $scope.StockTemp = [];
+      $scope.ClientSelected = '';
 
       (function init() {
 
@@ -130,6 +131,13 @@ angular.module('invoicing', [])
             $scope.Stock = data;
           });
         }()
+
+        !function () {
+          $http.get('../ClientListDB.json').success(function (data) {
+            $scope.ClientList = data;
+          });
+        }()
+
         // Attempt to load invoice from local storage
         !function () {
           var invoice = LocalStorage.getInvoice();
@@ -163,9 +171,8 @@ angular.module('invoicing', [])
       };
 
       $scope.printInfo = function () {
-        console.log('printInfo')
         var ipcRenderer = require("electron").ipcRenderer;
-        ipcRenderer.send('my-Stock', $scope.StockTemp);
+        ipcRenderer.send('my-Stock', $scope.StockTemp, $scope.invoice);
         window.print();
       };
 
@@ -180,10 +187,21 @@ angular.module('invoicing', [])
         //$scope.invoice.items.push({ qty: 0, cost: 0, description: "" });
         //$scope.invoice.items[$scope.invoice.items.indexOf(item)].cost = $scope.Stock[$scope.Stock.indexOf(item.description)].Prix;
         //$scope.Stock = []
+        var existStock = false;
         angular.forEach($scope.Stock, function (stock, key) {
           if (stock.NomProduit == item.description) {
-            $scope.invoice.items[$scope.invoice.items.indexOf(item)].cost = stock.PrixCatA
-            $scope.invoice.items[$scope.invoice.items.indexOf(item)].qty = stock.NbrStock
+            if($scope.ClientSelected == ''){
+              $scope.invoice.items[$scope.invoice.items.indexOf(item)].cost = stock.PrixCatA
+              $scope.invoice.items[$scope.invoice.items.indexOf(item)].qty = stock.NbrStock
+            } else {
+              $scope.invoice.items[$scope.invoice.items.indexOf(item)].cost = stock[$scope.ClientSelected.typeFacture]
+              $scope.invoice.items[$scope.invoice.items.indexOf(item)].qty = stock.NbrStock
+            }
+            existStock =  true;
+          }
+          if ((key == $scope.Stock.length - 1)&& (existStock == false)) {
+            $scope.invoice.items[$scope.invoice.items.indexOf(item)].cost = '';
+            $scope.invoice.items[$scope.invoice.items.indexOf(item)].qty = '';
           }
         });
       };
@@ -216,6 +234,32 @@ angular.module('invoicing', [])
         }
       }
 
+      $scope.getClientInfo = function(codeClient){
+        var existClient = false;
+        angular.forEach($scope.ClientList, function (client, key){
+          if(client.codeClient == codeClient){
+            $scope.ClientSelected = client;
+            existClient = true;
+            $scope.invoice.customer_info.nomClient = client.nomClient;
+            $scope.invoice.customer_info.webSite = client.webSite;
+            $scope.invoice.customer_info.Adresse = client.Adresse;
+            $scope.invoice.customer_info.codePostal = client.codePostal;
+            for(var i = 0; i < $scope.invoice.items.length; i++){
+              $scope.searchStock($scope.invoice.items[i]);
+            }
+          }
+          if ((key == $scope.ClientList.length - 1)&& (existClient == false)) {
+            $scope.ClientSelected = '';
+            $scope.invoice.customer_info.nomClient = '';
+            $scope.invoice.customer_info.webSite = '';
+            $scope.invoice.customer_info.Adresse = '';
+            $scope.invoice.customer_info.codePostal = '';
+            for(var i = 0; i < $scope.invoice.items.length; i++){
+              $scope.searchStock($scope.invoice.items[i]);
+            }
+          }
+        })
+      }
 
       // Calculates the sub total of the invoice
       $scope.invoiceSubTotal = function () {
@@ -234,15 +278,17 @@ angular.module('invoicing', [])
       // Calculates the grand total of the invoice
       $scope.calculateGrandTotal = function () {
         saveInvoice();
-        return $scope.calculateTax() + $scope.invoiceSubTotal();
+        //return $scope.calculateTax() + $scope.invoiceSubTotal();
+        return $scope.invoiceSubTotal()
       };
 
       // Clears the local storage
       $scope.clearLocalStorage = function () {
-        var confirmClear = confirm('Are you sure you would like to clear the invoice?');
+        var confirmClear = confirm('Êtes-vous sûr de vouloir effacer la facture?');
         if (confirmClear) {
           LocalStorage.clear();
           setInvoice(DEFAULT_INVOICE);
+          $window.location.reload();
         }
       };
 

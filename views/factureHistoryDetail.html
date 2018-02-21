@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Facture</title>
+    <link rel="stylesheet" href="../css/bootstrap3.min.css">
+
+    <link rel="stylesheet" type="text/css" href="../css/style.css">
+</head>
+
+<body>
+    <div class="container" width="800px" id="invoice">
+        <div class="row">
+            <div class="col-xs-12 heading">
+                <h1>Facture</h1>
+            </div>
+        </div>
+        <div class="row branding">
+            <div class="col-xs-6">
+                <div class="invoice-number-container">
+                    <label for="invoice-number">Facture Ref#</label>
+                    <input type="text" id="invoice-number" readonly/>
+                </div>
+            </div>
+            <div class="col-xs-6 logo-container">
+                <input type="file" id="imgInp" />
+                <img id="company_logo" src="../images/metaware_logo.png" alt="your image" width="300" />
+                <div>
+                </div>
+            </div>
+        </div>
+        <div class="row infos">
+            <div class="col-xs-6">
+                <div class="input-container">
+                    <input type="text" id="invoice.company_info.codeClient" readonly/>
+                </div>
+                <div class="input-container">
+                    <input type="text" id="invoice.company_info.nomClient" readonly/>
+                </div>
+                <div class="input-container">
+                    <input type="text" id="invoice.company_info.Adresse" readonly/>
+                </div>
+                <div class="input-container">
+                    <input type="text" id="invoice.company_info.codePostal" readonly/>
+                </div>
+                <div class="input-container">
+                    <input type="text" id="invoice.company_info.webSite" readonly/>
+                </div>
+            </div>
+            <div class="col-xs-6 right">
+                <div class="input-container">
+                    <input type="text" id="invoice.customer_info.codeClient" readonly/>
+                </div>
+                <div class="input-container">
+                    <input type="text" id="invoice.customer_info.nomClient" readonly/>
+                </div>
+                <div class="input-container">
+                    <input type="text" id="invoice.customer_info.Adresse" readonly/>
+                </div>
+                <div class="input-container">
+                    <input type="text" id="invoice.customer_info.codePostal" readonly/>
+                </div>
+                <div class="input-container">
+                    <input type="text" id="invoice.customer_info.webSite" readonly/>
+                </div>
+            </div>
+        </div>
+        <div class="items-table">
+            <div class="row header">
+                <div class="col-xs-1">&nbsp;</div>
+                <div class="col-xs-5">Description</div>
+                <div class="col-xs-2">Quantité</div>
+                <div class="col-xs-2">Prix.unit DT</div>
+                <div class="col-xs-2 text-right">Total</div>
+            </div>
+            <div class="row invoice-item" id="invoice-item">
+
+            </div>
+            <div class="row header">
+                <div class="col-xs-10 text-right">Total:</div>
+                <div class="col-xs-2 text-right" id="totalAll"></div>
+            </div>
+        </div>
+        <div class="row noPrint actions">
+            <a href="#" class="btn btn-success" onclick="printInfo()">Imprimé</a>
+        </div>
+    </div>
+
+    <div class="copy noPrint">
+        Fait par
+        <span class="love">&#9829;</span> à Hammam Lif par
+        <a href="https://www.facebook.com/alaa069">Alaa BEN JABALLAH</a> et
+        <a href="https://www.facebook.com/ridha.noomane">Ridha NOOMANE</a>
+    </div>
+
+
+    <script src="../js/index.js"></script>
+    <script>
+        ipcRenderer.on('factureHistoryItem', function (e, data) {
+            console.log(data)
+            document.getElementById("invoice-number").value = data.invoice_number;
+            document.getElementById("invoice.company_info.codeClient").value = data.company_info.codeClient;
+            document.getElementById("invoice.company_info.nomClient").value = data.company_info.nomClient;
+            document.getElementById("invoice.company_info.Adresse").value = data.company_info.Adresse;
+            document.getElementById("invoice.company_info.codePostal").value = data.company_info.codePostal;
+            document.getElementById("invoice.company_info.webSite").value = data.company_info.webSite;
+            document.getElementById("invoice.customer_info.codeClient").value = data.customer_info.codeClient;
+            document.getElementById("invoice.customer_info.nomClient").value = data.customer_info.nomClient;
+            document.getElementById("invoice.customer_info.Adresse").value = data.customer_info.Adresse;
+            document.getElementById("invoice.customer_info.codePostal").value = data.customer_info.codePostal;
+            document.getElementById("invoice.customer_info.webSite").value = data.customer_info.webSite;
+            //document.getElementById("totalAll").innerHTML = 
+            var invoice_item = document.getElementById("invoice-item");
+            var totalAll = 0;
+            for(var i = 0; i < data.items.length; i++){
+                /*var divDescription = document.createElement('div');
+                divDescription.className("col-xs-5 input-container");
+                divDescription.innerHTML = data.items[i].description;
+                var divQuantity = document.createElement('div');
+                divQuantity.className("col-xs-2 input-container");
+                divQuantity.innerHTML = data.items[i].qty;
+                var divCost = document.createElement('div');
+                divCost.className("col-xs-2 input-container");
+                divCost.innerHTML = data.items[i].cost
+                var divTotal = document.createElement('div');
+                divTotal.className("col-xs-2 text-right input-container");
+                divTotal.innerHTML = data.items[i].cost * data.items[i].qty
+                if(i == data.items.length - 1){
+                    invoice_item.appendChild(divDescription)
+                    invoice_item.appendChild(divQuantity)
+                    invoice_item.appendChild(divCost)
+                    invoice_item.appendChild(divTotal)
+                }*/
+                var div = document.createElement('div');
+                div.innerHTML = ' <div class="col-xs-5 input-container">\
+                    <input id="item.description" value="'+data.items[i].description+'" placeholder="Description" readonly/>\
+                </div>\
+                <div class="col-xs-2 input-container">\
+                    <input id="item.qty" value="'+data.items[i].qty+'" size="4" placeholder="Quantity" readonly/>\
+                </div>\
+                <div class="col-xs-2 input-container">\
+                    <input id="item.cost" value="'+data.items[i].cost+'" size="6" placeholder="Cost" readonly/>\
+                </div>\
+                <div class="col-xs-2 text-right input-container"> '+parseFloat(data.items[i].cost) * parseFloat(data.items[i].qty)+'</div>'
+                totalAll = totalAll + (parseFloat(data.items[i].cost) * parseFloat(data.items[i].qty))
+                invoice_item.appendChild(div)
+                if(i == data.items.length - 1){
+                    document.getElementById("totalAll").innerHTML = totalAll;
+                }
+            }
+        })
+        function printInfo(){
+            window.print();
+        }
+    </script>
+
+</body>
+
+</html>
