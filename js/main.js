@@ -135,6 +135,7 @@ angular.module('invoicing', [])
         !function () {
           $http.get('../ClientListDB.json').success(function (data) {
             $scope.ClientList = data;
+            $window.ClientList = data;
           });
         }()
 
@@ -183,6 +184,7 @@ angular.module('invoicing', [])
 
       // Search stock
       $scope.searchStock = function (item) {
+        console.log(item, $scope.invoice.items.indexOf(item))
         //console.log(JSON.stringify($scope.Stock))
         //$scope.invoice.items.push({ qty: 0, cost: 0, description: "" });
         //$scope.invoice.items[$scope.invoice.items.indexOf(item)].cost = $scope.Stock[$scope.Stock.indexOf(item.description)].Prix;
@@ -190,18 +192,18 @@ angular.module('invoicing', [])
         var existStock = false;
         angular.forEach($scope.Stock, function (stock, key) {
           if (stock.NomProduit == item.description) {
-            if($scope.ClientSelected == ''){
+            if ($scope.ClientSelected == '') {
               $scope.invoice.items[$scope.invoice.items.indexOf(item)].cost = stock.PrixCatA
-              $scope.invoice.items[$scope.invoice.items.indexOf(item)].qty = stock.NbrStock
+              //$scope.invoice.items[$scope.invoice.items.indexOf(item)].qty = stock.NbrStock
             } else {
               $scope.invoice.items[$scope.invoice.items.indexOf(item)].cost = stock[$scope.ClientSelected.typeFacture]
-              $scope.invoice.items[$scope.invoice.items.indexOf(item)].qty = stock.NbrStock
+              //$scope.invoice.items[$scope.invoice.items.indexOf(item)].qty = stock.NbrStock
             }
-            existStock =  true;
+            existStock = true;
           }
-          if ((key == $scope.Stock.length - 1)&& (existStock == false)) {
+          if ((key == $scope.Stock.length - 1) && (existStock == false)) {
             $scope.invoice.items[$scope.invoice.items.indexOf(item)].cost = '';
-            $scope.invoice.items[$scope.invoice.items.indexOf(item)].qty = '';
+            //$scope.invoice.items[$scope.invoice.items.indexOf(item)].qty = '';
           }
         });
       };
@@ -234,31 +236,84 @@ angular.module('invoicing', [])
         }
       }
 
-      $scope.getClientInfo = function(codeClient){
+      $scope.getClientInfo = function (codeClient) {
         var existClient = false;
-        angular.forEach($scope.ClientList, function (client, key){
-          if(client.codeClient == codeClient){
+        angular.forEach($scope.ClientList, function (client, key) {
+          if (client.codeClient == codeClient) {
             $scope.ClientSelected = client;
             existClient = true;
             $scope.invoice.customer_info.nomClient = client.nomClient;
             $scope.invoice.customer_info.webSite = client.webSite;
             $scope.invoice.customer_info.Adresse = client.Adresse;
             $scope.invoice.customer_info.codePostal = client.codePostal;
-            for(var i = 0; i < $scope.invoice.items.length; i++){
+            for (var i = 0; i < $scope.invoice.items.length; i++) {
               $scope.searchStock($scope.invoice.items[i]);
             }
           }
-          if ((key == $scope.ClientList.length - 1)&& (existClient == false)) {
+          if ((key == $scope.ClientList.length - 1) && (existClient == false)) {
             $scope.ClientSelected = '';
             $scope.invoice.customer_info.nomClient = '';
             $scope.invoice.customer_info.webSite = '';
             $scope.invoice.customer_info.Adresse = '';
             $scope.invoice.customer_info.codePostal = '';
-            for(var i = 0; i < $scope.invoice.items.length; i++){
+            for (var i = 0; i < $scope.invoice.items.length; i++) {
               $scope.searchStock($scope.invoice.items[i]);
             }
           }
         })
+      }
+      var _StockList = JSON.parse(fs.readFileSync('./StockDB.json'));
+      $scope.myFunctionFactDesc = function (index, item) {
+        var _stockArray = [];
+
+        for (var i = 0; i < _StockList.length; i++) {
+          _stockArray.push(_StockList[i].NomProduit)
+        }
+
+        var inputListdescription = document.getElementById("browsersListdescription" + index);
+
+        new Awesomplete(inputListdescription, {
+          list: _stockArray,
+
+          filter: function (text, input) {
+            return Awesomplete.FILTER_CONTAINS(text, input.match(/[^,]*$/)[0]);
+          },
+
+          item: function (text, input) {
+            return Awesomplete.ITEM(text, input.match(/[^,]*$/)[0]);
+          },
+
+          replace: function (text) {
+            var before = this.input.value.match(/^.+,\s*|/)[0];
+            this.input.value = before + text;
+          }
+        });
+        inputListdescription.addEventListener("awesomplete-select", function (event) {
+          $scope.searchStockList(index, event.text.value);
+          console.log(event.text.label, event.text.value);
+        });
+      }
+
+      $scope.searchStockList = function (index, text) {
+        //item.description = text.value
+        $scope.invoice.items[index].description = text
+        var existStock = false;
+        angular.forEach($scope.Stock, function (stock, key) {
+          if (stock.NomProduit == text) {
+            if ($scope.ClientSelected == '') {
+              $scope.invoice.items[index].cost = stock.PrixCatA
+              $scope.invoice.items[index].qty = stock.NbrStock
+            } else {
+              $scope.invoice.items[index].cost = stock[$scope.ClientSelected.typeFacture]
+              $scope.invoice.items[index].qty = stock.NbrStock
+            }
+            existStock = true;
+          }
+          if ((key == $scope.Stock.length - 1) && (existStock == false)) {
+            $scope.invoice.items[index].cost = '';
+            $scope.invoice.items[index].qty = '';
+          }
+        });
       }
 
       // Calculates the sub total of the invoice

@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="../css/bootstrap3.min.css">
 
     <link rel="stylesheet" type="text/css" href="../css/style.css">
+    <link rel="stylesheet" href="../css/awesomplete.css">
 </head>
 
 <body ng-app="invoicing" ng-controller="InvoiceCtrl">
@@ -69,7 +70,6 @@
                 </ul>
             </div>
     </nav>
-
     <!--<div class="container">
         <h1>My facture</h1>
         <input type="text" id="searchItem" oninput="searchStock()">
@@ -123,11 +123,8 @@
             </div>
             <div class="col-xs-6 right">
                 <div class="input-container">
-                    <input type="text" ng-model="invoice.customer_info.codeClient" list="clientList" ng-change="getClientInfo(invoice.customer_info.codeClient)"
+                    <input type="text" id='myinput' ng-model="invoice.customer_info.codeClient" ng-change="getClientInfo(invoice.customer_info.codeClient)"
                     />
-                    <datalist id="clientList">
-                        <option ng-repeat="client in ClientList" value="{{client.codeClient}}" />
-                    </datalist>
                 </div>
                 <div class="input-container">
                     <input type="text" ng-model="invoice.customer_info.nomClient" />
@@ -151,15 +148,13 @@
                 <div class="col-xs-2">Prix.unit {{currencySymbol}}</div>
                 <div class="col-xs-2 text-right">Total</div>
             </div>
-            <div class="row invoice-item" ng-repeat="item in invoice.items" ng-animate="'slide-down'">
+            <div class="row invoice-item" ng-repeat="item in invoice.items">
                 <div class="col-xs-1 remove-item-container">
                     <a href ng-hide="printMode" ng-click="removeItem(item)" class="btn btn-danger">[X]</a>
                 </div>
                 <div class="col-xs-5 input-container">
-                    <input data-ng-model="item.description" ng-change="searchStock(item)" placeholder="Description" list="browsersList" />
-                    <datalist id="browsersList">
-                        <option ng-repeat="stock in Stock" value="{{stock.NomProduit}}" />
-                    </datalist>
+                    <input ng-model="item.description" placeholder="Description" minChars="1" ng-change="myFunctionFactDesc($index, item)" id="browsersListdescription{{$index}}"
+                    />
                 </div>
                 <div class="col-xs-2 input-container">
                     <input ng-model="item.qty" value="1" size="4" ng-change="stockManager(item)" ng-required ng-validate="integer" placeholder="Quantity"
@@ -211,6 +206,56 @@
     <script type="text/javascript" src="../js/angular.min.js"></script>
     <script type="text/javascript" src="../js/moment.min.js"></script>
     <script type="text/javascript" src="../js/main.js"></script>
+    <script src="../js/awesomplete.js"></script>
+
+    <script>
+        var input = document.getElementById("myinput");
+        var _ClientList = JSON.parse(fs.readFileSync('./ClientListDB.json'));
+
+        var _clientArray = [];
+
+
+        for (var i = 0; i < _ClientList.length; i++) {
+            _clientArray.push(_ClientList[i].codeClient)
+        }
+        new Awesomplete(input, {
+            list: _clientArray,
+
+            filter: function (text, input) {
+                return Awesomplete.FILTER_CONTAINS(text, input.match(/[^,]*$/)[0]);
+            },
+
+            item: function (text, input) {
+                return Awesomplete.ITEM(text, input.match(/[^,]*$/)[0]);
+            },
+
+            replace: function (text) {
+                var before = this.input.value.match(/^.+,\s*|/)[0];
+                this.input.value = before + text; // + ", ";
+            }
+        });
+        /*var inputListdescription = document.getElementById("browsersListdescription0");
+        console.log(inputListdescription.value)
+        new Awesomplete(inputListdescription, {
+            list: ["aaa", "bbb", "ccc"], //_stockArray,
+
+            filter: function (text, input) {
+                return Awesomplete.FILTER_CONTAINS(text, input.match(/[^,]*$/)[0]);
+            },
+
+            item: function (text, input) {
+                return Awesomplete.ITEM(text, input.match(/[^,]*$/)[0]);
+            },
+
+            replace: function (text) {
+                var before = this.input.value.match(/^.+,\s*|/)[0];
+                this.input.value = before + text; // + ", ";
+            }
+        });*/
+        //function myFunctionFactDesc(index) {
+
+
+    </script>
 </body>
 
 </html>

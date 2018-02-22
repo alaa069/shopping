@@ -9,12 +9,12 @@ let mainWindow;
 let dashWindow;
 let factureHistoryItemWindow;
 const dataBase = fs.readFileSync('./db.json');
-const dataBaseParse = JSON.parse(dataBase);
+var dataBaseParse = JSON.parse(dataBase);
 const User = dataBaseParse.User;
 const StockDB = fs.readFileSync('./StockDB.json');
-const Stock = JSON.parse(StockDB);
+var Stock = JSON.parse(StockDB);
 const FactureHitoryDB = fs.readFileSync('./FactureHistoryDB.json');
-const FactureHitory = JSON.parse(FactureHitoryDB);
+var FactureHitory = JSON.parse(FactureHitoryDB);
 
 // Listen for app to be ready
 app.on('ready', function () {
@@ -42,7 +42,7 @@ ipcMain.on('login', function (e, username, password) {
         }
     }
     if (userExist) {
-        const injectCode = fs.readFileSync("./js/inputlistpopup.js", "utf8");
+        //const injectCode = fs.readFileSync("./js/inputlistpopup.js", "utf8");
         // Create new window
         dashWindow = new BrowserWindow({
             width: 992,
@@ -55,9 +55,9 @@ ipcMain.on('login', function (e, username, password) {
             protocol: 'file:',
             slashes: true
         }));
-        dashWindow.webContents.on("did-finish-load", () => {
+        /*dashWindow.webContents.on("did-finish-load", () => {
             dashWindow.webContents.executeJavaScript(injectCode);
-        });
+        });*/
         mainWindow.close();
         // Add new Menu
         mainMenuTemplate.push({ label: 'Dashboard', submenu: [{ label: 'Facture', click() { goToFacture(); } }, { label: 'Stock', click() { goToStock(); } }, { label: 'List Client', click() { goToListClient(); } }, { label: 'Bon de livraison', click() { goToBonDeLivraison(); } }, { label: 'Facture History', click() { goToFactureHistory(); } }] });
