@@ -13,8 +13,13 @@ var dataBaseParse = JSON.parse(dataBase);
 const User = dataBaseParse.User;
 const StockDB = fs.readFileSync('./StockDB.json');
 var Stock = JSON.parse(StockDB);
-const FactureHitoryDB = fs.readFileSync('./FactureHistoryDB.json');
+var  FactureHitoryDB = fs.readFileSync('./FactureHistoryDB.json');
 var FactureHitory = JSON.parse(FactureHitoryDB);
+var ClientList = JSON.parse(fs.readFileSync('./ClientListDB.json', 'utf8'));
+
+var indexRow;
+let deleteUpdate;
+let addProduit;
 
 // Listen for app to be ready
 app.on('ready', function () {
@@ -47,7 +52,9 @@ ipcMain.on('login', function (e, username, password) {
         dashWindow = new BrowserWindow({
             width: 992,
             height: 700,
-            title: 'Tableau de bord'
+            title: 'Tableau de bord',
+            enableLargerThanScreen: true
+            //fullscreen: true
         })
         // Load HTML file into window
         dashWindow.loadURL(url.format({
@@ -55,6 +62,9 @@ ipcMain.on('login', function (e, username, password) {
             protocol: 'file:',
             slashes: true
         }));
+        dashWindow.maximize()
+        dashWindow.setMaximizable(false)
+        dashWindow.setResizable(false)
         /*dashWindow.webContents.on("did-finish-load", () => {
             dashWindow.webContents.executeJavaScript(injectCode);
         });*/
@@ -80,8 +90,8 @@ ipcMain.on('my-Stock', function (e, data, invoice) {
         if (i == Stock.length - 1) {
             fs.writeFileSync('./StockDB.json', JSON.stringify(Stock))
             setTimeout(function () {
-                const FactureHitoryDB = fs.readFileSync('./FactureHistoryDB.json');
-                const FactureHitory = JSON.parse(FactureHitoryDB);
+                FactureHitoryDB = fs.readFileSync('./FactureHistoryDB.json');
+                FactureHitory = JSON.parse(FactureHitoryDB);
             }, 200)
         }
     }
@@ -102,9 +112,54 @@ ipcMain.on('factureOpenEventListItem', function (e, data) {
     }));
     setTimeout(function () {
         factureHistoryItemWindow.webContents.send('factureHistoryItem', FactureHitory[data]);
-    }, 500)
+    }, 1000)
 
 })
+
+function createProduit(){
+    addProduit=new BrowserWindow({
+        width:400,
+        height:550,
+        title: "Ajout Produit"
+
+    })
+    addProduit.loadURL(url.format({
+        pathname: path.join(__dirname, 'views/ajoutProduit.html'),
+        protocol: 'file:',
+        slashes: true
+    }));
+}
+
+function createClient(){
+    addProduit=new BrowserWindow({
+        width:400,
+        height:550,
+        title: "Ajout Client"
+
+    })
+    addProduit.loadURL(url.format({
+        pathname: path.join(__dirname, 'views/ajoutClient.html'),
+        protocol: 'file:',
+        slashes: true
+    }));
+}
+
+function goToEditStock(index){
+    deleteUpdate=new BrowserWindow({
+        width:890,
+        height:550,
+        title: "Edit Stock"
+
+    })
+    deleteUpdate.loadURL(url.format({
+        pathname: path.join(__dirname, 'views/deleteUpdate.html'),
+        protocol: 'file:',
+        slashes: true
+    }));
+
+    
+}
+
 
 function goToFacture() {
     dashWindow.loadURL(url.format({
@@ -153,6 +208,67 @@ function goToFactureHistory() {
         slashes: true
     }));
 }
+
+ipcMain.on('item:add',function(e, item){
+   
+    Stock.push({
+        Reference : item[0],
+        NomProduit : item[1],
+        PrixAchat : item[2],
+        NbrStock : item[3],
+        PrixCatA : item[4],
+        PrixCatB : item[5],
+        PrixCatC : item[6],
+    })
+    fs.writeFileSync('./StockDB.json', JSON.stringify(Stock), 'utf8');
+    dashWindow.webContents.send('item:add', item);
+    addProduit.close();
+});
+
+ipcMain.on('item:addClient',function(e, item){
+   
+    ClientList.push({
+        codeClient : item[0],
+        nomClient : item[1],
+        webSite : item[2],
+        Adresse : item[3],
+        codePostal : item[4],
+        typeFacture : item[5]
+    })
+    fs.writeFileSync('./ClientListDB.json', JSON.stringify(ClientList), 'utf8');
+    dashWindow.webContents.send('item:addClient', item);
+    addProduit.close();
+    console.log(item)
+});
+
+ipcMain.on('delete:update', function(e, index){
+    console.log('row :'+index);
+    goToEditStock(index);
+    indexRow=index-1;
+    
+
+});
+
+ipcMain.on('ajoutProduit', function(){
+    createProduit();
+});
+
+ipcMain.on('ajoutClient', function(){
+    createClient();
+});
+
+ipcMain.on('load:ready', function(e, yes){
+    deleteUpdate.webContents.send('index', indexRow);
+});
+
+ipcMain.on('edit:complete', function(){
+ deleteUpdate.close();
+    dashWindow.loadURL(url.format({
+        pathname: path.join(__dirname, 'views/stock.html'),
+        protocol: 'file:',
+        slashes: true
+    }));
+});
 
 ipcMain.on('factureOpenEvent', function (e, item) {
     goToFacture()

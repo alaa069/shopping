@@ -112,7 +112,7 @@
             document.getElementById("invoice.customer_info.webSite").value = data.customer_info.webSite;
             //document.getElementById("totalAll").innerHTML = 
             var invoice_item = document.getElementById("invoice-item");
-            var totalAll = 0;
+            var totalAll = 0.00;
             for(var i = 0; i < data.items.length; i++){
                 /*var divDescription = document.createElement('div');
                 divDescription.className("col-xs-5 input-container");
@@ -143,11 +143,11 @@
                 <div class="col-xs-2 input-container">\
                     <input id="item.cost" value="'+data.items[i].cost+'" size="6" placeholder="Cost" readonly/>\
                 </div>\
-                <div class="col-xs-2 text-right input-container"> '+parseFloat(data.items[i].cost) * parseFloat(data.items[i].qty)+'</div>'
+                <div class="col-xs-2 text-right input-container"> DT '+(parseFloat(data.items[i].cost) * parseFloat(data.items[i].qty)).toFixed(2)+'</div>'
                 totalAll = totalAll + (parseFloat(data.items[i].cost) * parseFloat(data.items[i].qty))
                 invoice_item.appendChild(div)
                 if(i == data.items.length - 1){
-                    document.getElementById("totalAll").innerHTML = totalAll;
+                    document.getElementById("totalAll").innerHTML = 'DT ' + totalAll.toFixed(2);
                 }
             }
         })

@@ -6,9 +6,10 @@
     <title>Bonde de livraison</title>
     <link rel="stylesheet" href="../css/bootstrap3.min.css">
     <link rel="stylesheet" type="text/css" href="../css/style.css">
+    <link rel="stylesheet" href="../css/awesomplete.css">
 </head>
 
-<body>
+<body ng-app="invoicing" ng-controller="InvoiceCtrl">
     <nav class="navbar navbar-default">
         <div class="container-fluid">
             <div class="navbar-header">
@@ -48,10 +49,187 @@
             </div>
     </nav>
 
-    <h1>Bon de livraison</h1>
+    <div class="container" width="800px" id="invoice">
+        <div class="row">
+            <div class="col-xs-12 heading">
+                <h1>Bon de livraison</h1>
+            </div>
+        </div>
+        <div class="row branding">
+            <div class="col-xs-6">
+                <div class="invoice-number-container">
+                    <label for="invoice-number">Bon de livraison Ref#</label>
+                    <input type="text" id="invoice-number" ng-model="invoice.invoice_number" />
+                </div>
+            </div>
+            <div class="col-xs-6 logo-container">
+                <input type="file" id="imgInp" />
+                <img ng-hide="logoRemoved" id="company_logo" ng-src="{{ logo }}" alt="your image" width="300" />
+                <div>
+                    <div class="noPrint" ng-hide="printMode">
+                        <a ng-click="editLogo()" href>Modifié Logo</a>
+                        <a ng-click="toggleLogo()" id="remove_logo" href>{{ logoRemoved ? 'Affiché' : 'Caché' }} logo</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row infos">
+            <div class="col-xs-6">
+                <div class="input-container">
+                    <input type="text" ng-model="invoice.company_info.codeClient" />
+                </div>
+                <div class="input-container">
+                    <input type="text" ng-model="invoice.company_info.nomClient" />
+                </div>
+                <div class="input-container">
+                    <input type="text" ng-model="invoice.company_info.Adresse" />
+                </div>
+                <div class="input-container">
+                    <input type="text" ng-model="invoice.company_info.codePostal" />
+                </div>
+                <div class="input-container">
+                    <input type="text" ng-model="invoice.company_info.webSite" />
+                </div>
+                <div class="input-container" data-ng-hide='printMode'>
+                    <select ng-model='currencySymbol' ng-options='currency.symbol as currency.name for currency in availableCurrencies'></select>
+                </div>
+            </div>
+            <div class="col-xs-6 right">
+                <div class="input-container">
+                    <input type="text" id='myinput' ng-model="invoice.customer_info.codeClient" ng-change="getClientInfo(invoice.customer_info.codeClient)"
+                    />
+                </div>
+                <div class="input-container">
+                    <input type="text" ng-model="invoice.customer_info.nomClient" />
+                </div>
+                <!--<div class="input-container">
+                    <input type="text" ng-model="invoice.customer_info.Adresse" />
+                </div>
+                <div class="input-container">
+                    <input type="text" ng-model="invoice.customer_info.codePostal" />
+                </div>
+                <div class="input-container">
+                    <input type="text" ng-model="invoice.customer_info.webSite" />
+                </div>-->
+            </div>
+        </div>
+        <div class="items-table">
+            <div class="row header">
+                <div class="col-xs-1">&nbsp;</div>
+                <div class="col-xs-5">Description</div>
+                <div class="col-xs-2">Quantité</div>
+                <div class="col-xs-2">Prix.unit {{currencySymbol}}</div>
+                <div class="col-xs-2 text-right">Total</div>
+            </div>
+            <div class="row invoice-item" ng-repeat="item in invoice.items">
+                <div class="col-xs-1 remove-item-container">
+                    <a href ng-hide="printMode" ng-click="removeItem(item)" class="btn btn-danger">[X]</a>
+                </div>
+                <div class="col-xs-5 input-container">
+                    <input ng-model="item.description" placeholder="Description" minChars="1" ng-change="myFunctionFactDesc($index, item)" id="browsersListdescription{{$index}}"
+                    />
+                </div>
+                <div class="col-xs-2 input-container">
+                    <input ng-model="item.qty" value="1" size="4" ng-change="stockManager(item)" ng-required ng-validate="integer" placeholder="Quantity"
+                    />
+                </div>
+                <div class="col-xs-2 input-container">
+                    <input ng-model="item.cost" value="0.00" ng-required ng-validate="number" size="6" placeholder="Cost" />
+                </div>
+                <div class="col-xs-2 text-right input-container">
+                    {{item.cost * item.qty | currency: currencySymbol}}
+                </div>
+            </div>
+            <div class="row invoice-item">
+                <div class="col-xs-12 add-item-container" ng-hide="printMode">
+                    <a class="btn btn-primary" href ng-click="addItem()">[+]</a>
+                </div>
+            </div>
+            <!--<div class="row">
+                <div class="col-xs-10 text-right">Total HT</div>
+                <div class="col-xs-2 text-right">{{invoiceSubTotal() | currency: currencySymbol}}</div>
+            </div>
+            <div class="row">
+                <div class="col-xs-10 text-right">Tax(%):
+                    <input ng-model="invoice.tax" ng-validate="number" style="width:43px">
+                </div>
+                <div class="col-xs-2 text-right">{{calculateTax() | currency: currencySymbol}}</div>
+            </div>-->
+            <div class="row header">
+                <div class="col-xs-10 text-right">Total:</div>
+                <div class="col-xs-2 text-right">{{calculateGrandTotal() | currency: currencySymbol}}</div>
+            </div>
+        </div>
+        <div class="row noPrint actions">
+            <a href="#" class="btn btn-success" ng-show="printMode" ng-click="printInfo()">Imprimé</a>
+            <a href="#" class="btn btn-danger" ng-click="clearLocalStorage()">Annuler</a>
+            <a href="#" class="btn btn-primary" ng-hide="printMode" ng-click="printMode = true;">Activé Mode Imprmante</a>
+            <a href="#" class="btn btn-primary" ng-show="printMode" ng-click="printMode = false;">Désactivé Mode Imprmante</a>
+        </div>
+    </div>
+
+    <div ng-hide="printMode" class="copy noPrint">
+        Fait par
+        <span class="love">&#9829;</span> à Hammam Lif par
+        <a href="https://www.facebook.com/alaa069">Alaa BEN JABALLAH</a> et
+        <a href="https://www.facebook.com/ridha.noomane">Ridha NOOMANE</a>
+    </div>
 
 
     <script src="../js/index.js"></script>
+    <script type="text/javascript" src="../js/angular.min.js"></script>
+    <script type="text/javascript" src="../js/moment.min.js"></script>    
+    <script src="../js/awesomplete.js"></script>
+    <script src="../js/main.bdl.js"></script>
+
+    <script>
+        var input = document.getElementById("myinput");
+        var _ClientList = JSON.parse(fs.readFileSync('./ClientListDB.json'));
+
+        var _clientArray = [];
+
+
+        for (var i = 0; i < _ClientList.length; i++) {
+            _clientArray.push(_ClientList[i].codeClient)
+        }
+        new Awesomplete(input, {
+            list: _clientArray,
+
+            filter: function (text, input) {
+                return Awesomplete.FILTER_CONTAINS(text, input.match(/[^,]*$/)[0]);
+            },
+
+            item: function (text, input) {
+                return Awesomplete.ITEM(text, input.match(/[^,]*$/)[0]);
+            },
+
+            replace: function (text) {
+                var before = this.input.value.match(/^.+,\s*|/)[0];
+                this.input.value = before + text; // + ", ";
+            }
+        });
+        /*var inputListdescription = document.getElementById("browsersListdescription0");
+        console.log(inputListdescription.value)
+        new Awesomplete(inputListdescription, {
+            list: ["aaa", "bbb", "ccc"], //_stockArray,
+
+            filter: function (text, input) {
+                return Awesomplete.FILTER_CONTAINS(text, input.match(/[^,]*$/)[0]);
+            },
+
+            item: function (text, input) {
+                return Awesomplete.ITEM(text, input.match(/[^,]*$/)[0]);
+            },
+
+            replace: function (text) {
+                var before = this.input.value.match(/^.+,\s*|/)[0];
+                this.input.value = before + text; // + ", ";
+            }
+        });*/
+        //function myFunctionFactDesc(index) {
+
+
+    </script>
 </body>
 
 </html>

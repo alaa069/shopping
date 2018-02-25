@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <style type="text/css">
+        .form-style-6 {
+            font: 95% Arial, Helvetica, sans-serif;
+            max-width: 400px;
+            margin: 10px auto;
+            padding: 16px;
+            background: #F7F7F7;
+            display: inline-block;
+        }
+
+        .form-style-6 h1 {
+            background: #d14343;
+            padding: 20px 0;
+            font-size: 140%;
+            font-weight: 300;
+            text-align: center;
+            color: #fff;
+            margin: -16px -16px 16px -16px;
+        }
+
+        .form-style-6 input[type="text"],
+        .form-style-6 input[type="date"],
+        .form-style-6 input[type="datetime"],
+        .form-style-6 input[type="email"],
+        .form-style-6 input[type="number"],
+        .form-style-6 input[type="search"],
+        .form-style-6 input[type="time"],
+        .form-style-6 input[type="url"],
+        .form-style-6 textarea,
+        .form-style-6 select {
+            -webkit-transition: all 0.30s ease-in-out;
+            -moz-transition: all 0.30s ease-in-out;
+            -ms-transition: all 0.30s ease-in-out;
+            -o-transition: all 0.30s ease-in-out;
+            outline: none;
+            box-sizing: border-box;
+            -webkit-box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            width: 100%;
+            background: #fff;
+            margin-bottom: 4%;
+            border: 1px solid #ccc;
+            padding: 3%;
+            color: #555;
+            font: 95% Arial, Helvetica, sans-serif;
+        }
+
+        .form-style-6 input[type="text"]:focus,
+        .form-style-6 input[type="date"]:focus,
+        .form-style-6 input[type="datetime"]:focus,
+        .form-style-6 input[type="email"]:focus,
+        .form-style-6 input[type="number"]:focus,
+        .form-style-6 input[type="search"]:focus,
+        .form-style-6 input[type="time"]:focus,
+        .form-style-6 input[type="url"]:focus,
+        .form-style-6 textarea:focus,
+        .form-style-6 select:focus {
+            box-shadow: 0 0 5px #d14343;
+            padding: 3%;
+            border: 1px solid #d14343;
+        }
+
+        .form-style-6 input[type="submit"],
+        .form-style-6 input[type="button"] {
+            box-sizing: border-box;
+            -webkit-box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            width: 100%;
+            padding: 3%;
+            background: #d14343;
+            border-bottom: 2px solid #d14343;
+            border-top-style: none;
+            border-right-style: none;
+            border-left-style: none;
+            color: #fff;
+            font-size: 18px;
+        }
+
+        .form-style-6 input[type="submit"]:hover,
+        .form-style-6 input[type="button"]:hover {
+            background: rgb(255, 0, 0);
+            font-size: 18px;
+        }
+    </style>
+    <title>Edit Stock</title>
+
+</head>
+
+<body>
+    <div class="form-style-6">
+        <h1>Edit Stock</h1>
+        <form id="myForm">
+            <input type="text" id="0" name="field1"  />
+            <input type="text" id="1" name="field1"  />
+            <input type="text" id="2" name="field1"  />
+            <input type="text" id="3" name="field1"  />
+            <input type="text" id="4" name="field1"  />
+            <input type="text" id="5" name="field1"  />
+            <input type="text" id="6" name="field1"  />
+            <input type="submit" onclick="update()" value="Edit Stock" />
+            <input type="submit" onclick="suprim()" id="delete" value="Supprimer" onclick="" />
+        </form>
+        
+    </div>
+    <div class="form-style-6">
+
+        <textarea id="myTextarea" rows="30" cols="60"></textarea>
+
+
+    </div>
+    <script>
+        const fs = require("fs");
+        const dataBase = fs.readFileSync('./db.json');
+        const electron = require('electron');
+        const { ipcRenderer } = electron;
+        var ancienStock;
+        var indexRow;
+        var yes = 'ready';
+        var obj = JSON.parse(fs.readFileSync('./StockDB.json', 'utf8'));
+        
+        ipcRenderer.send('load:ready', yes);
+        fs.readFile('./logStockEdit.txt', 'utf8', function(err, contents) {
+            document.getElementById('myTextarea').value = contents;
+        });
+
+        ipcRenderer.on('index', function(e, index) {
+        indexRow=index;
+        ancienStock = obj[index].NbrStock;
+        document.getElementById('0').value = obj[index].Reference;
+        document.getElementById('1').value = obj[index].NomProduit;
+        document.getElementById('2').value = obj[index].PrixAchat;
+        document.getElementById('3').value = obj[index].NbrStock;
+        document.getElementById('4').value = obj[index].PrixCatA;
+        document.getElementById('5').value = obj[index].PrixCatB;
+        document.getElementById('6').value = obj[index].PrixCatC;  
+        
+        }); 
+
+        
+        function suprim() {
+            
+            var r=  confirm ("Vous étes sure !?");
+            if (r == true) {
+                
+                obj.splice(indexRow, 1);
+                fs.writeFileSync('./StockDB.json', JSON.stringify(obj), 'utf8'); 
+            } 
+            ipcRenderer.send('edit:complete');
+        }
+
+        function update(){
+            
+            var r=  confirm ("Vous étes sure !?");
+            if (r == true) {
+                obj[indexRow].Reference=document.getElementById("0").value;
+                obj[indexRow].NomProduit=document.getElementById("1").value;
+                obj[indexRow].PrixAchat=document.getElementById("2").value;
+                obj[indexRow].NbrStock=document.getElementById("3").value;
+                obj[indexRow].PrixCatA=document.getElementById("4").value;
+                obj[indexRow].PrixCatB=document.getElementById("5").value;
+                obj[indexRow].PrixCatC=document.getElementById("6").value;
+                fs.appendFile('./logStockEdit.txt',Date()+' : '+ancienStock+' ---> '+obj[indexRow].NbrStock+'\n', function (err) {
+                if (err) {
+                    // append failed
+                } else {
+                    // done
+                }
+                })
+                fs.writeFileSync('./StockDB.json', JSON.stringify(obj), 'utf8'); 
+                ipcRenderer.send('edit:complete');
+
+
+                
+                
+
+            }
+        }
+    </script>
+
+
+
+</body>
+
+</html>
