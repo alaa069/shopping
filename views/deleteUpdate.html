@@ -95,17 +95,17 @@
     <div class="form-style-6">
         <h1>Edit Stock</h1>
         <form id="myForm">
-            <input type="text" id="0" name="field1"  />
-            <input type="text" id="1" name="field1"  />
-            <input type="text" id="2" name="field1"  />
-            <input type="text" id="3" name="field1"  />
-            <input type="text" id="4" name="field1"  />
-            <input type="text" id="5" name="field1"  />
-            <input type="text" id="6" name="field1"  />
+            <input type="text" id="0" name="field1" />
+            <input type="text" id="1" name="field1" />
+            <input type="text" id="2" name="field1" />
+            <input type="text" id="3" name="field1" />
+            <input type="text" id="4" name="field1" />
+            <input type="text" id="5" name="field1" />
+            <input type="text" id="6" name="field1" />
             <input type="submit" onclick="update()" value="Edit Stock" />
             <input type="submit" onclick="suprim()" id="delete" value="Supprimer" onclick="" />
         </form>
-        
+
     </div>
     <div class="form-style-6">
 
@@ -113,70 +113,111 @@
 
 
     </div>
+
+    <script type="text/javascript" src="../js/moment.min.js"></script>
+
     <script>
         const fs = require("fs");
-        const dataBase = fs.readFileSync('./db.json');
         const electron = require('electron');
         const { ipcRenderer } = electron;
         var ancienStock;
         var indexRow;
         var yes = 'ready';
         var obj = JSON.parse(fs.readFileSync('./StockDB.json', 'utf8'));
-        
+        var stockHist = JSON.parse(fs.readFileSync('./StockHistoryDB.json'));
+
         ipcRenderer.send('load:ready', yes);
-        fs.readFile('./logStockEdit.txt', 'utf8', function(err, contents) {
+        /*fs.readFile('./logStockEdit.txt', 'utf8', function(err, contents) {
             document.getElementById('myTextarea').value = contents;
+        });*/
+
+        ipcRenderer.on('index', function (e, index) {
+            indexRow = index;
+            ancienStock = obj[index].NbrStock;
+            document.getElementById('0').value = obj[index].Reference;
+            document.getElementById('1').value = obj[index].NomProduit;
+            document.getElementById('2').value = obj[index].PrixAchat;
+            document.getElementById('3').value = obj[index].NbrStock;
+            document.getElementById('4').value = obj[index].PrixCatA;
+            document.getElementById('5').value = obj[index].PrixCatB;
+            document.getElementById('6').value = obj[index].PrixCatC;
+            for (var i = 0; i < stockHist.length; i++) {
+                if ((stockHist[i].Reference == obj[index].Reference) && (stockHist[i].History.length > 0)) {
+                    var stckhis = "";
+                    for (var j = 0; j < stockHist[i].History.length; j++) {
+                        stckhis = stckhis + 'Date: ' + stockHist[i].History[j].Date + ' Ancien: ' + stockHist[i].History[j].Ancien + ' Ajouter:' + stockHist[i].History[j].Ajouter + '\n'
+                        if (j == stockHist[i].History.length - 1)
+                            document.getElementById('myTextarea').value = stckhis;
+                    }
+                }
+            }
         });
 
-        ipcRenderer.on('index', function(e, index) {
-        indexRow=index;
-        ancienStock = obj[index].NbrStock;
-        document.getElementById('0').value = obj[index].Reference;
-        document.getElementById('1').value = obj[index].NomProduit;
-        document.getElementById('2').value = obj[index].PrixAchat;
-        document.getElementById('3').value = obj[index].NbrStock;
-        document.getElementById('4').value = obj[index].PrixCatA;
-        document.getElementById('5').value = obj[index].PrixCatB;
-        document.getElementById('6').value = obj[index].PrixCatC;  
-        
-        }); 
 
-        
         function suprim() {
-            
-            var r=  confirm ("Vous étes sure !?");
+
+            var r = confirm("Vous étes sure !?");
             if (r == true) {
-                
+
                 obj.splice(indexRow, 1);
-                fs.writeFileSync('./StockDB.json', JSON.stringify(obj), 'utf8'); 
-            } 
+                fs.writeFileSync('./StockDB.json', JSON.stringify(obj), 'utf8');
+            }
             ipcRenderer.send('edit:complete');
         }
 
-        function update(){
-            
-            var r=  confirm ("Vous étes sure !?");
+        function update() {
+
+            var r = confirm("Vous étes sure !?");
             if (r == true) {
-                obj[indexRow].Reference=document.getElementById("0").value;
-                obj[indexRow].NomProduit=document.getElementById("1").value;
-                obj[indexRow].PrixAchat=document.getElementById("2").value;
-                obj[indexRow].NbrStock=document.getElementById("3").value;
-                obj[indexRow].PrixCatA=document.getElementById("4").value;
-                obj[indexRow].PrixCatB=document.getElementById("5").value;
-                obj[indexRow].PrixCatC=document.getElementById("6").value;
-                fs.appendFile('./logStockEdit.txt',Date()+' : '+ancienStock+' ---> '+obj[indexRow].NbrStock+'\n', function (err) {
-                if (err) {
-                    // append failed
-                } else {
-                    // done
+                obj[indexRow].Reference = document.getElementById("0").value;
+                obj[indexRow].NomProduit = document.getElementById("1").value;
+                obj[indexRow].PrixAchat = document.getElementById("2").value;
+                obj[indexRow].NbrStock = document.getElementById("3").value;
+                obj[indexRow].PrixCatA = document.getElementById("4").value;
+                obj[indexRow].PrixCatB = document.getElementById("5").value;
+                obj[indexRow].PrixCatC = document.getElementById("6").value;
+                if (ancienStock != document.getElementById("3").value) {
+                    var exist = false;
+                    for (var i = 0; i < stockHist.length; i++) {
+                        if (stockHist[i].Reference == document.getElementById("0").value) {
+                            exist = true;
+                            stockHist[i].History.unshift({
+                                "Date": moment().format('DD/MM/YYYY HH:mm:ss'),
+                                "Ancien": parseInt(ancienStock),
+                                "Ajouter": parseInt(document.getElementById("3").value) - parseInt(ancienStock)
+                            })
+                        }
+                        if (i == stockHist.length - 1) {
+                            if (exist) {
+                                fs.writeFileSync('./StockHistoryDB.json', JSON.stringify(stockHist), 'utf8');
+                            } else {
+                                stockHist.push({
+                                    Reference: document.getElementById("0").value,
+                                    History: [{
+                                        "Date": moment().format('DD/MM/YYYY HH:mm:ss'),
+                                        "Ancien": parseInt(ancienStock),
+                                        "Ajouter": parseInt(document.getElementById("3").value) - parseInt(ancienStock)
+                                    }]
+                                })
+                                fs.writeFileSync('./StockHistoryDB.json', JSON.stringify(stockHist), 'utf8');
+                            }
+                        }
+                    }
+                    //fs.writeFileSync('./StockDB.json', JSON.stringify(obj), 'utf8');
                 }
-                })
-                fs.writeFileSync('./StockDB.json', JSON.stringify(obj), 'utf8'); 
+                /*fs.appendFile('./logStockEdit.txt', Date() + ' : ' + ancienStock + ' ---> ' + obj[indexRow].NbrStock + '\n', function (err) {
+                    if (err) {
+                        // append failed
+                    } else {
+                        // done
+                    }
+                })*/
+                fs.writeFileSync('./StockDB.json', JSON.stringify(obj), 'utf8');
                 ipcRenderer.send('edit:complete');
 
 
-                
-                
+
+
 
             }
         }

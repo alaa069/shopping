@@ -98,7 +98,7 @@
     <script src="../js/index.js"></script>
     <script>
         ipcRenderer.on('factureHistoryItem', function (e, data) {
-            console.log(data)
+            //console.log(data)
             document.getElementById("invoice-number").value = data.invoice_number;
             document.getElementById("invoice.company_info.codeClient").value = data.company_info.codeClient;
             document.getElementById("invoice.company_info.nomClient").value = data.company_info.nomClient;

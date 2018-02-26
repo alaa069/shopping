@@ -238,11 +238,11 @@ ipcMain.on('item:addClient',function(e, item){
     fs.writeFileSync('./ClientListDB.json', JSON.stringify(ClientList), 'utf8');
     dashWindow.webContents.send('item:addClient', item);
     addProduit.close();
-    console.log(item)
+    //console.log(item)
 });
 
 ipcMain.on('delete:update', function(e, index){
-    console.log('row :'+index);
+    //console.log('row :'+index);
     goToEditStock(index);
     indexRow=index-1;
     

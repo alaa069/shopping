@@ -184,7 +184,7 @@ angular.module('invoicing', [])
 
       // Search stock
       $scope.searchStock = function (item) {
-        console.log(item, $scope.invoice.items.indexOf(item))
+        //console.log(item, $scope.invoice.items.indexOf(item))
         //console.log(JSON.stringify($scope.Stock))
         //$scope.invoice.items.push({ qty: 0, cost: 0, description: "" });
         //$scope.invoice.items[$scope.invoice.items.indexOf(item)].cost = $scope.Stock[$scope.Stock.indexOf(item.description)].Prix;
@@ -290,7 +290,7 @@ angular.module('invoicing', [])
         });
         inputListdescription.addEventListener("awesomplete-select", function (event) {
           $scope.searchStockList(index, event.text.value);
-          console.log(event.text.label, event.text.value);
+          //console.log(event.text.label, event.text.value);
         });
       }
 
