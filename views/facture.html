@@ -210,7 +210,7 @@
 
     <script>
         var input = document.getElementById("myinput");
-        var _ClientList = JSON.parse(fs.readFileSync('./ClientListDB.json'));
+        var _ClientList = JSON.parse(fs.readFileSync(path.resolve(__dirname, '..', 'ClientListDB.json')));
 
         var _clientArray = [];
 

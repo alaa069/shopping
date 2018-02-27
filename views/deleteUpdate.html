@@ -118,13 +118,14 @@
 
     <script>
         const fs = require("fs");
+        const path = require("path");
         const electron = require('electron');
         const { ipcRenderer } = electron;
         var ancienStock;
         var indexRow;
         var yes = 'ready';
-        var obj = JSON.parse(fs.readFileSync('./StockDB.json', 'utf8'));
-        var stockHist = JSON.parse(fs.readFileSync('./StockHistoryDB.json'));
+        var obj = JSON.parse(fs.readFileSync(path.resolve(__dirname, '..', 'StockDB.json'), 'utf8'));
+        var stockHist = JSON.parse(fs.readFileSync(path.resolve(__dirname, '..', 'StockHistoryDB.json')));
 
         ipcRenderer.send('load:ready', yes);
         /*fs.readFile('./logStockEdit.txt', 'utf8', function(err, contents) {
@@ -160,7 +161,7 @@
             if (r == true) {
 
                 obj.splice(indexRow, 1);
-                fs.writeFileSync('./StockDB.json', JSON.stringify(obj), 'utf8');
+                fs.writeFileSync(path.resolve(__dirname, '..', 'StockDB.json'), JSON.stringify(obj), 'utf8');
             }
             ipcRenderer.send('edit:complete');
         }
@@ -189,7 +190,7 @@
                         }
                         if (i == stockHist.length - 1) {
                             if (exist) {
-                                fs.writeFileSync('./StockHistoryDB.json', JSON.stringify(stockHist), 'utf8');
+                                fs.writeFileSync(path.resolve(__dirname, '..', 'StockHistoryDB.json'), JSON.stringify(stockHist), 'utf8');
                             } else {
                                 stockHist.push({
                                     Reference: document.getElementById("0").value,
@@ -199,7 +200,7 @@
                                         "Ajouter": parseInt(document.getElementById("3").value) - parseInt(ancienStock)
                                     }]
                                 })
-                                fs.writeFileSync('./StockHistoryDB.json', JSON.stringify(stockHist), 'utf8');
+                                fs.writeFileSync(path.resolve(__dirname, '..', 'StockHistoryDB.json'), JSON.stringify(stockHist), 'utf8');
                             }
                         }
                     }
@@ -212,7 +213,7 @@
                         // done
                     }
                 })*/
-                fs.writeFileSync('./StockDB.json', JSON.stringify(obj), 'utf8');
+                fs.writeFileSync(path.resolve(__dirname, '..', 'StockDB.json'), JSON.stringify(obj), 'utf8');
                 ipcRenderer.send('edit:complete');
 
 

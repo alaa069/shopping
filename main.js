@@ -8,14 +8,14 @@ const { app, BrowserWindow, Menu, ipcMain } = electron;
 let mainWindow;
 let dashWindow;
 let factureHistoryItemWindow;
-const dataBase = fs.readFileSync('./db.json');
+const dataBase = fs.readFileSync(path.resolve(__dirname, 'db.json'));//path.resolve(__dirname, 'data', 'db.json');
 var dataBaseParse = JSON.parse(dataBase);
 const User = dataBaseParse.User;
-const StockDB = fs.readFileSync('./StockDB.json');
+const StockDB = fs.readFileSync(path.resolve(__dirname, 'StockDB.json'));
 var Stock = JSON.parse(StockDB);
-var  FactureHitoryDB = fs.readFileSync('./FactureHistoryDB.json');
+var  FactureHitoryDB = fs.readFileSync(path.resolve(__dirname, 'FactureHistoryDB.json'));
 var FactureHitory = JSON.parse(FactureHitoryDB);
-var ClientList = JSON.parse(fs.readFileSync('./ClientListDB.json', 'utf8'));
+var ClientList = JSON.parse(fs.readFileSync(path.resolve(__dirname, 'ClientListDB.json')));
 
 var indexRow;
 let deleteUpdate;
@@ -88,17 +88,17 @@ ipcMain.on('my-Stock', function (e, data, invoice) {
             }
         }
         if (i == Stock.length - 1) {
-            fs.writeFileSync('./StockDB.json', JSON.stringify(Stock))
+            fs.writeFileSync(path.resolve(__dirname, 'StockDB.json'), JSON.stringify(Stock))
             setTimeout(function () {
-                FactureHitoryDB = fs.readFileSync('./FactureHistoryDB.json');
+                FactureHitoryDB = fs.readFileSync(path.resolve(__dirname, 'FactureHistoryDB.json'));
                 FactureHitory = JSON.parse(FactureHitoryDB);
             }, 200)
         }
     }
     FactureHitory.unshift(invoice);
-    fs.writeFileSync('./FactureHistoryDB.json', JSON.stringify(FactureHitory));
+    fs.writeFileSync(path.resolve(__dirname, 'FactureHistoryDB.json'), JSON.stringify(FactureHitory));
     setTimeout(function () {
-        FactureHitoryDB = fs.readFileSync('./FactureHistoryDB.json');
+        FactureHitoryDB = fs.readFileSync(path.resolve(__dirname, 'FactureHistoryDB.json'));
         FactureHitory = JSON.parse(FactureHitoryDB);
     }, 200)
 })
@@ -220,7 +220,7 @@ ipcMain.on('item:add',function(e, item){
         PrixCatB : item[5],
         PrixCatC : item[6],
     })
-    fs.writeFileSync('./StockDB.json', JSON.stringify(Stock), 'utf8');
+    fs.writeFileSync(path.resolve(__dirname, 'StockDB.json'), JSON.stringify(Stock), 'utf8');
     dashWindow.webContents.send('item:add', item);
     addProduit.close();
 });
@@ -235,7 +235,7 @@ ipcMain.on('item:addClient',function(e, item){
         codePostal : item[4],
         typeFacture : item[5]
     })
-    fs.writeFileSync('./ClientListDB.json', JSON.stringify(ClientList), 'utf8');
+    fs.writeFileSync(path.resolve(__dirname, 'ClientListDB.json'), JSON.stringify(ClientList), 'utf8');
     dashWindow.webContents.send('item:addClient', item);
     addProduit.close();
     //console.log(item)

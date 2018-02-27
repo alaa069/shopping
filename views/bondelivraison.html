@@ -29,7 +29,7 @@
                         <a href="#" onclick="myDashboardOpen();">Tableau de bord</a>
                     </li>
                     <li>
-                        <a href="#" onclick="myFactureOpen">Facture</a>
+                        <a href="#" onclick="myFactureOpen();">Facture</a>
                     </li>
                     <li>
                         <a href="#" onclick="myStockOpen();">Stock</a>
@@ -184,7 +184,7 @@
 
     <script>
         var input = document.getElementById("myinput");
-        var _ClientList = JSON.parse(fs.readFileSync('./ClientListDB.json'));
+        var _ClientList = JSON.parse(fs.readFileSync(path.resolve(__dirname, '..', 'ClientListDB.json')));
 
         var _clientArray = [];
 

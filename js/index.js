@@ -1,13 +1,14 @@
 const electron = require('electron');
 const { ipcRenderer } = electron;
 const fs = require("fs");
+const path = require("path");
 
-const dataBase = fs.readFileSync('./db.json');
+const dataBase = fs.readFileSync(path.resolve(__dirname, '..', 'db.json'));
 const dataBaseParse = JSON.parse(dataBase);
 const User = dataBaseParse.User;
-const StockDB = fs.readFileSync('./StockDB.json');
+const StockDB = fs.readFileSync(path.resolve(__dirname, '..', 'StockDB.json'));
 const Stock = JSON.parse(StockDB);
-const factureHistoryList = JSON.parse(fs.readFileSync('./FactureHistoryDB.json'));
+const factureHistoryList = JSON.parse(fs.readFileSync(path.resolve(__dirname, '..', 'FactureHistoryDB.json')));
 
 function myFactureOpen() {
     ipcRenderer.send('factureOpenEvent');
@@ -52,7 +53,7 @@ for (var i = 0; i < factureHistoryList.length; i ++){
 }
 
 // Ridha
-var obj = JSON.parse(fs.readFileSync('./StockDB.json', 'utf8'));
+var obj = JSON.parse(fs.readFileSync(path.resolve(__dirname, '..', 'StockDB.json'), 'utf8'));
 
 const table = document.getElementById("myTable").getElementsByTagName('tbody')[0];
         

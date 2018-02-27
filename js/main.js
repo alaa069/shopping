@@ -127,13 +127,13 @@ angular.module('invoicing', [])
       (function init() {
 
         !function () {
-          $http.get('../StockDB.json').success(function (data) {
+          $http.get(path.resolve(__dirname, '..', 'StockDB.json')).success(function (data) {
             $scope.Stock = data;
           });
         }()
 
         !function () {
-          $http.get('../ClientListDB.json').success(function (data) {
+          $http.get(path.resolve(__dirname, '..', 'ClientListDB.json')).success(function (data) {
             $scope.ClientList = data;
             $window.ClientList = data;
           });
@@ -262,7 +262,7 @@ angular.module('invoicing', [])
           }
         })
       }
-      var _StockList = JSON.parse(fs.readFileSync('./StockDB.json'));
+      var _StockList = JSON.parse(fs.readFileSync(path.resolve(__dirname, '..', 'StockDB.json')));
       $scope.myFunctionFactDesc = function (index, item) {
         var _stockArray = [];
 
