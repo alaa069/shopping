@@ -36,6 +36,10 @@ function myFactureHistoryOpen() {
     ipcRenderer.send('facturehistoryOpenEvent');
 }
 
+function myBonDeLivraisonHistoryOpen() {
+    ipcRenderer.send('bondelivraisonHistoryOpenEvent');
+}
+
 var myFactureList = document.getElementById("myFactureList").getElementsByTagName("tbody")[0];
 
 for (var i = 0; i < factureHistoryList.length; i ++){

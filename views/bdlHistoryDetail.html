@@ -101,7 +101,7 @@
 
     <script src="../js/index.js"></script>
     <script>
-        ipcRenderer.on('factureHistoryItem', function (e, data) {
+        ipcRenderer.on('bdlHistoryItem', function (e, data) {
             //console.log(data)
             document.getElementById("invoice-number").value = data.invoice_number;
             document.getElementById("invoice-date").value = data.invoice_data;

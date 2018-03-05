@@ -36,6 +36,10 @@ function myFactureHistoryOpen() {
     ipcRenderer.send('facturehistoryOpenEvent');
 }
 
+function myBonDeLivraisonHistoryOpen() {
+    ipcRenderer.send('bondelivraisonHistoryOpenEvent');
+}
+
 // Ridha
 var obj = JSON.parse(fs.readFileSync(path.resolve(__dirname, '..', 'StockDB.json'), 'utf8'));
 

@@ -7,6 +7,7 @@ angular.module('invoicing', [])
   .constant('DEFAULT_INVOICE', {
     //tax: 13.00,
     invoice_number: moment().format('YYYYMMDDHHmmss'),
+    invoice_data: moment().format('DD/MM/YYYY'),
     customer_info: {
       codeClient: 'client00',
       nomClient: 'Mr. John Doe',
@@ -15,11 +16,11 @@ angular.module('invoicing', [])
       codePostal: '90210'
     },
     company_info: {
-      codeClient: 'Fornisseur1234',
-      nomClient: 'Ayman Inc',
-      webSite: 'www.metawarelabs.com',
-      Adresse: 'Hay Mohamed Ali, Hammam Lif',
-      codePostal: '2050'
+      codeClient: 'Sté ADEM',
+      nomClient: 'Vente en Gros Produits Alimentaires',
+      webSite: 'GSM: 20 282 219 / 94 141 960',
+      Adresse: 'MF: 1549543/E',
+      codePostal: 'Hammam Lif'
     },
     items: [
       //{ qty: 10, description: 'Gadget', cost: 9.95 }
@@ -318,7 +319,7 @@ angular.module('invoicing', [])
 
       // Calculates the sub total of the invoice
       $scope.invoiceSubTotal = function () {
-        var total = 0.00;
+        var total = 0.000;
         angular.forEach($scope.invoice.items, function (item, key) {
           total += (item.qty * item.cost);
         });

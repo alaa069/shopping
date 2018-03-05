@@ -8,6 +8,7 @@ const { app, BrowserWindow, Menu, ipcMain } = electron;
 let mainWindow;
 let dashWindow;
 let factureHistoryItemWindow;
+let bdlHistoryItemWindow;
 const dataBase = fs.readFileSync(path.resolve(__dirname, 'db.json'));//path.resolve(__dirname, 'data', 'db.json');
 var dataBaseParse = JSON.parse(dataBase);
 const User = dataBaseParse.User;
@@ -16,6 +17,7 @@ var Stock = JSON.parse(StockDB);
 var  FactureHitoryDB = fs.readFileSync(path.resolve(__dirname, 'FactureHistoryDB.json'));
 var FactureHitory = JSON.parse(FactureHitoryDB);
 var ClientList = JSON.parse(fs.readFileSync(path.resolve(__dirname, 'ClientListDB.json')));
+var BDLHistoryDB = JSON.parse(fs.readFileSync(path.resolve(__dirname, 'BDLHistoryDB.json')));
 
 var indexRow;
 let deleteUpdate;
@@ -70,7 +72,14 @@ ipcMain.on('login', function (e, username, password) {
         });*/
         mainWindow.close();
         // Add new Menu
-        mainMenuTemplate.push({ label: 'Dashboard', submenu: [{ label: 'Facture', click() { goToFacture(); } }, { label: 'Stock', click() { goToStock(); } }, { label: 'List Client', click() { goToListClient(); } }, { label: 'Bon de livraison', click() { goToBonDeLivraison(); } }, { label: 'Facture History', click() { goToFactureHistory(); } }] });
+        mainMenuTemplate.push({ label: 'Dashboard', submenu: [
+            { label: 'Facture', click() { goToFacture(); } }, 
+            { label: 'Stock', click() { goToStock(); } }, 
+            { label: 'List Client', click() { goToListClient(); } }, 
+            { label: 'Bon de livraison', click() { goToBonDeLivraison(); } }, 
+            { label: 'Facture History', click() { goToFactureHistory(); } },
+            { label: 'Bon de livraison History', click() { goToBondelivraisonHistory(); } }
+        ] });
         // Build new Menu from template
         const mainMenu = Menu.buildFromTemplate(mainMenuTemplate);
         // Insert new Menu
@@ -112,6 +121,27 @@ ipcMain.on('factureOpenEventListItem', function (e, data) {
     }));
     setTimeout(function () {
         factureHistoryItemWindow.webContents.send('factureHistoryItem', FactureHitory[data]);
+    }, 1000)
+
+})
+
+ipcMain.on('BD_my-Stock', function (e, data, invoice) {
+    BDLHistoryDB.unshift(invoice);
+    fs.writeFileSync(path.resolve(__dirname, 'BDLHistoryDB.json'), JSON.stringify(BDLHistoryDB));
+    setTimeout(function () {
+        BDLHistoryDB = JSON.parse(fs.readFileSync(path.resolve(__dirname, 'BDLHistoryDB.json')));
+    }, 200)
+})
+
+ipcMain.on('BDLOpenEventListItem', function (e, data) {
+    bdlHistoryItemWindow = new BrowserWindow({})
+    bdlHistoryItemWindow.loadURL(url.format({
+        pathname: path.join(__dirname, 'views/bdlHistoryDetail.html'),
+        protocol: 'file:',
+        slashes: true
+    }));
+    setTimeout(function () {
+        bdlHistoryItemWindow.webContents.send('bdlHistoryItem', BDLHistoryDB[data]);
     }, 1000)
 
 })
@@ -209,6 +239,14 @@ function goToFactureHistory() {
     }));
 }
 
+function goToBondelivraisonHistory() {
+    dashWindow.loadURL(url.format({
+        pathname: path.join(__dirname, 'views/bondelivraisonHistory.html'),
+        protocol: 'file:',
+        slashes: true
+    }));
+}
+
 ipcMain.on('item:add',function(e, item){
    
     Stock.push({
@@ -294,6 +332,9 @@ ipcMain.on('facturehistoryOpenEvent', function (e, item) {
     goToFactureHistory()
 })
 
+ipcMain.on('bondelivraisonHistoryOpenEvent', function (e, item) {
+    goToBondelivraisonHistory()
+})
 
 //mainWindow.webContents.send('item:add', item);
 

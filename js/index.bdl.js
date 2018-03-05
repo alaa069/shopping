@@ -8,7 +8,7 @@ const dataBaseParse = JSON.parse(dataBase);
 const User = dataBaseParse.User;
 const StockDB = fs.readFileSync(path.resolve(__dirname, '..', 'StockDB.json'));
 const Stock = JSON.parse(StockDB);
-const factureHistoryList = JSON.parse(fs.readFileSync(path.resolve(__dirname, '..', 'FactureHistoryDB.json')));
+const factureHistoryList = JSON.parse(fs.readFileSync(path.resolve(__dirname, '..', 'BDLHistoryDB.json')));
 
 function myFactureOpen() {
     ipcRenderer.send('factureOpenEvent');
@@ -40,14 +40,30 @@ function myBonDeLivraisonHistoryOpen() {
     ipcRenderer.send('bondelivraisonHistoryOpenEvent');
 }
 
+var myFactureList = document.getElementById("myFactureList").getElementsByTagName("tbody")[0];
+
+for (var i = 0; i < factureHistoryList.length; i ++){
+    var rowList = myFactureList.insertRow(myFactureList.rows.length);
+
+    var cell1 = rowList.insertCell(0);
+    var cell2 = rowList.insertCell(1);
+
+    cell1.innerHTML = factureHistoryList[i].invoice_number;
+    cell2.innerHTML = factureHistoryList[i].customer_info.codeClient;
+
+    rowList.onclick= function(){
+        ipcRenderer.send('BDLOpenEventListItem', this.rowIndex - 1);
+    };
+}
+
 // Ridha
-var obj = JSON.parse(fs.readFileSync(path.resolve(__dirname, '..', 'ClientListDB.json')));
+var obj = JSON.parse(fs.readFileSync(path.resolve(__dirname, '..', 'StockDB.json'), 'utf8'));
 
 const table = document.getElementById("myTable").getElementsByTagName('tbody')[0];
         
  for(var i=0;i<obj.length;i++){   
     var row = table.insertRow(table.rows.length);
-    //row.onclick= function() { deleteUpdate(this.rowIndex); };
+    row.onclick= function() { deleteUpdate(this.rowIndex); };
     row.className = "row100 head";
     var cell1 = row.insertCell(0);
     var cell2 = row.insertCell(1);
@@ -55,6 +71,7 @@ const table = document.getElementById("myTable").getElementsByTagName('tbody')[0
     var cell4 = row.insertCell(3);
     var cell5 = row.insertCell(4);
     var cell6 = row.insertCell(5);
+    var cell7 = row.insertCell(6);
 
 
     cell1.className = "column100 column1";
@@ -63,15 +80,17 @@ const table = document.getElementById("myTable").getElementsByTagName('tbody')[0
     cell4.className = "column100 column4";
     cell5.className = "column100 column5";
     cell6.className = "column100 column6";
+    cell7.className = "column100 column7";
 
    
 
-    cell1.innerHTML = obj[i].codeClient;
-    cell2.innerHTML = obj[i].nomClient;
-    cell3.innerHTML = obj[i].webSite;
-    cell4.innerHTML = obj[i].Adresse;
-    cell5.innerHTML = obj[i].codePostal;
-    cell6.innerHTML = obj[i].typeFacture;
+    cell1.innerHTML = obj[i].Reference;
+    cell2.innerHTML = obj[i].NomProduit;
+    cell3.innerHTML = obj[i].PrixAchat;
+    cell4.innerHTML = obj[i].NbrStock;
+    cell5.innerHTML = obj[i].PrixCatA;
+    cell6.innerHTML = obj[i].PrixCatB;
+    cell7.innerHTML = obj[i].PrixCatC;
 }
 //////
 
@@ -80,7 +99,7 @@ function deleteUpdate(index){
    //alert('ROw : '+index);
 }
 
-function myAjoutClient(){
+function myAjoutProduit(){
     //alert("Hello World!");
-    ipcRenderer.send('ajoutClient');
+    ipcRenderer.send('ajoutProduit');
 }
