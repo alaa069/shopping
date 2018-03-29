@@ -12,6 +12,6 @@
   "author": "Alaa BEN JABALLAH",
   "license": "MIT",
   "dependencies": {
-    "electron": "^1.8.2"
+    "electron": "^1.8.3"
   }
 }
